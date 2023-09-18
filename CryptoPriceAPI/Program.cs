@@ -10,10 +10,17 @@ namespace CryptoPriceAPI
 
 			builder.Logging.ClearProviders().AddConsole();
 
+			var src = builder.Configuration.GetSection("Sources");
+
+
 			// Add services to the container.
 			System.String connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 			builder.Services.AddDbContext<CryptoPriceAPI.Data.CryptoPriceAPIContext>(options => options.UseNpgsql(connectionString));
 			builder.Services.AddScoped<CryptoPriceAPI.Data.CryptoPriceAPIQueryContext>();
+
+			builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(Program).Assembly));
+
+			builder.Services.AddSingleton<Microsoft.Extensions.Configuration.IConfiguration>(builder.Configuration);
 
 			builder.Services.AddControllers();
 

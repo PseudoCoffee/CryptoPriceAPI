@@ -1,0 +1,44 @@
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace CryptoPriceAPI.Queries
+{
+	public class GetPriceQuery : MediatR.IRequest<CryptoPriceAPI.Data.Entities.Price?>
+	{
+		public System.String SourceName { get; set; }
+
+		public System.DateOnly DateOnly { get; set; }
+
+		public System.Int32 Hour {  get; set; }
+
+		public CryptoPriceAPI.Data.Entities.FinancialInstrumentName FinancialInstrumentName { get; set; }
+
+		public GetPriceQuery(System.String sourceName, System.DateOnly dateOnly, System.Int32 hour, CryptoPriceAPI.Data.Entities.FinancialInstrumentName financialInstrumentName)
+		{
+			SourceName = sourceName;
+			DateOnly = dateOnly;
+			Hour = hour;
+			FinancialInstrumentName = financialInstrumentName;
+		}
+	}
+
+	public class GetPriceQueryHandler : MediatR.IRequestHandler<GetPriceQuery, CryptoPriceAPI.Data.Entities.Price?>
+	{
+		private readonly CryptoPriceAPI.Data.CryptoPriceAPIQueryContext _queryContext;
+
+		public GetPriceQueryHandler(CryptoPriceAPI.Data.CryptoPriceAPIQueryContext queryContext)
+		{
+			_queryContext = queryContext;
+		}
+
+		public async Task<CryptoPriceAPI.Data.Entities.Price?> Handle(GetPriceQuery request, CancellationToken cancellationToken)
+		{
+			DateTime dateHour = request.DateOnly.ToDateTime(new TimeOnly(request.Hour, 0));
+
+			return await _queryContext.Prices.FirstOrDefaultAsync(price => 
+					price.SourceName == request.SourceName && 
+					price.DateAndHour == dateHour && 
+					price.FinancialInstrumentName == request.FinancialInstrumentName,
+				cancellationToken: cancellationToken).ConfigureAwait(false);
+		}
+	}
+}
