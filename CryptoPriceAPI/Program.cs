@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace CryptoPriceAPI
 {
 	public class Program
@@ -9,6 +11,9 @@ namespace CryptoPriceAPI
 			builder.Logging.ClearProviders().AddConsole();
 
 			// Add services to the container.
+			System.String connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+			builder.Services.AddDbContext<CryptoPriceAPI.Data.CryptoPriceAPIContext>(options => options.UseNpgsql(connectionString));
+			builder.Services.AddScoped<CryptoPriceAPI.Data.CryptoPriceAPIQueryContext>();
 
 			builder.Services.AddControllers();
 
@@ -16,7 +21,13 @@ namespace CryptoPriceAPI
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
-			var app = builder.Build();
+			Microsoft.AspNetCore.Builder.WebApplication app = builder.Build();
+
+			//using (Microsoft.Extensions.DependencyInjection.IServiceScope scope = app.Services.CreateScope())
+			//{
+			//	using CryptoPriceAPI.Data.CryptoPriceAPIContext? context = scope.ServiceProvider.GetService<CryptoPriceAPI.Data.CryptoPriceAPIContext>();
+			//	context!.Database.EnsureCreated();
+			//}
 
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
