@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  cryptopriceapi:
+    image: ${DOCKER_REGISTRY-}cryptopriceapi
+    build:
+      context: .
+      dockerfile: CryptoPriceAPI/Dockerfile
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: Crypto
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 1(K-60kd*1
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: postgres_admin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
+      PGADMIN_DEFAULT_PASSWORD: wS2fq;=0A2
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
