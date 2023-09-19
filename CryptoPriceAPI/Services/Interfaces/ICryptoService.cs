@@ -1,10 +1,7 @@
-﻿using CryptoPriceAPI.Data.Entities;
-using CryptoPriceAPI.DTOs;
-
-namespace CryptoPriceAPI.Services.Interfaces
+﻿namespace CryptoPriceAPI.Services.Interfaces
 {
 	public interface ICryptoService
 	{
-		Task<PriceDTO> GetPrice(DateOnly date, int hour, FinancialInstrument financialInstrumentName = FinancialInstrument.BTCUSD);
+		Task<CryptoPriceAPI.DTOs.PriceDTO> GetPriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD);
 	}
 }

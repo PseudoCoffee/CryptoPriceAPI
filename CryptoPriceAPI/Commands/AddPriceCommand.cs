@@ -7,19 +7,16 @@ namespace CryptoPriceAPI.Commands
 	{
 		public System.Guid SourceId { get; set; }
 
-		public System.DateOnly DateOnly { get; set; }
-
-		public System.Int32 Hour { get; set; }
+		public CryptoPriceAPI.Data.Entities.DateAndHour DateAndHour { get; set; }
 
 		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrumentName { get; set; }
 
 		public System.Single ClosePrice { get; set; }
 
-		public AddPriceCommand(System.Guid sourceId, System.DateOnly dateOnly, System.Int32 hour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName, System.Single closePrice)
+		public AddPriceCommand(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName, System.Single closePrice)
 		{
 			SourceId = sourceId;
-			DateOnly = dateOnly;
-			Hour = hour;
+			DateAndHour = dateAndHour;
 			FinancialInstrumentName = financialInstrumentName;
 			ClosePrice = closePrice;
 		}
@@ -36,12 +33,10 @@ namespace CryptoPriceAPI.Commands
 
 		public async Task Handle(AddPriceCommand request, CancellationToken cancellationToken)
 		{
-			System.DateTime dateAndHour = request.DateOnly.ToDateTime(new System.TimeOnly(request.Hour, 0));
-
 			CryptoPriceAPI.Data.Entities.Price price = new()
 			{
 				SourceId = request.SourceId,
-				DateAndHour = dateAndHour,
+				DateAndHour = request.DateAndHour,
 				FinancialInstrumentName = request.FinancialInstrumentName,
 				ClosePrice = request.ClosePrice
 			};

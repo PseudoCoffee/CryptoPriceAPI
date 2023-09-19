@@ -9,16 +9,15 @@
 		public System.Int64 DateAndHourTicks { get; private set; }
 
 		[System.ComponentModel.DataAnnotations.Schema.NotMapped]
-		public System.DateTime DateAndHour
+		public CryptoPriceAPI.Data.Entities.DateAndHour DateAndHour
 		{
 			get
 			{
-				return new(DateAndHourTicks);
+				return new DateAndHour(DateAndHourTicks);
 			}
 			set
 			{
-				// truncate the DateTime to only date and hour
-				DateAndHourTicks = value.Ticks / System.TimeSpan.TicksPerHour * System.TimeSpan.TicksPerHour;
+				DateAndHourTicks = value.DateTime.Ticks;
 			}
 		}
 

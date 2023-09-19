@@ -114,7 +114,7 @@ namespace CryptoPriceAPI.IntegrationTests
 			System.Single price = GetPrice(PriceSet.Aggregated, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await this.aggregatedPriceController.GetCandleClosePrice(dateOnly, hour);
+			DTOs.PriceDTO response = await this.aggregatedPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
 			Assert.Equal(price, response.ClosePrice);
@@ -133,7 +133,7 @@ namespace CryptoPriceAPI.IntegrationTests
 			System.Single price = GetPrice(PriceSet.Bitfinex, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await bitfinexPriceController.GetCandleClosePrice(dateOnly, hour);
+			DTOs.PriceDTO response = await bitfinexPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
 			Assert.Equal(price, response.ClosePrice);
@@ -152,7 +152,7 @@ namespace CryptoPriceAPI.IntegrationTests
 			System.Single price = GetPrice(PriceSet.Bitstamp, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await bitstampPriceController.GetCandleClosePrice(dateOnly, hour);
+			DTOs.PriceDTO response = await bitstampPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
 			Assert.Equal(price, response.ClosePrice);

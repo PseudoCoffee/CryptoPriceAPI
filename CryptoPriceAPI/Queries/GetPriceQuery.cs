@@ -6,17 +6,14 @@ namespace CryptoPriceAPI.Queries
 	{
 		public System.Guid SourceId { get; set; }
 
-		public System.DateOnly DateOnly { get; set; }
-
-		public System.Int32 Hour {  get; set; }
+		public CryptoPriceAPI.Data.Entities.DateAndHour DateAndHour { get; set; }
 
 		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrumentName { get; set; }
 
-		public GetPriceQuery(System.Guid sourceId, System.DateOnly dateOnly, System.Int32 hour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName)
+		public GetPriceQuery(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName)
 		{
 			SourceId = sourceId;
-			DateOnly = dateOnly;
-			Hour = hour;
+			DateAndHour = dateAndHour;
 			FinancialInstrumentName = financialInstrumentName;
 		}
 	}
@@ -32,13 +29,9 @@ namespace CryptoPriceAPI.Queries
 
 		public async Task<CryptoPriceAPI.Data.Entities.Price?> Handle(GetPriceQuery request, CancellationToken cancellationToken)
 		{
-			System.DateTime dateHour = request.DateOnly.ToDateTime(new TimeOnly(request.Hour, 0));
-
-			var all = _queryContext.Prices.ToList();
-
-			return await _queryContext.Prices.FirstOrDefaultAsync(price => 
-					price.SourceId == request.SourceId && 
-					price.DateAndHourTicks == dateHour.Ticks && 
+			return await _queryContext.Prices.FirstOrDefaultAsync(price =>
+					price.SourceId == request.SourceId &&
+					price.DateAndHourTicks == request.DateAndHour.DateTime.Ticks &&
 					price.FinancialInstrumentName == request.FinancialInstrumentName,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}

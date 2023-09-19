@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace CryptoPriceAPI
 {
@@ -36,7 +35,10 @@ namespace CryptoPriceAPI
 
 			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AggregationService>();
 
-			builder.Services.AddControllers();
+			builder.Services.AddControllers().AddJsonOptions(config =>
+			{
+				config.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+			});
 
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
