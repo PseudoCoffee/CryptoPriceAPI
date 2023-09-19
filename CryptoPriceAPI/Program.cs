@@ -11,6 +11,8 @@ namespace CryptoPriceAPI
 
 			builder.Logging.ClearProviders().AddConsole();
 
+			builder.Configuration.AddJsonFile("priceSources.json");
+
 			builder.Services.Configure<CryptoPriceAPI.Services.Configuration.PriceSources>((settings) =>
 			{
 				builder.Configuration.GetSection("PriceSources").Bind(settings);

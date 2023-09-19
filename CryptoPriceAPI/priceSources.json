@@ -16,15 +16,5 @@
 			"limitFormat": "limit={0}",
 			"timeFormat": "milliseconds"
 		}
-	},
-	"ConnectionStrings": {
-		"DefaultConnection": "User ID=user;Password=1(K-60kd*1;Host=postgres_database;Port=5432;Database=Crypto;Connection Lifetime=0;"
-	},
-	"Logging": {
-		"LogLevel": {
-			"Default": "Information",
-			"Microsoft.AspNetCore": "Warning"
-		}
-	},
-	"AllowedHosts": "*"
+	}
 }

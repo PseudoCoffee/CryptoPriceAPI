@@ -23,11 +23,6 @@
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_sourceName = sourceName;
 			_cryptoConfiguration = options.Value[sourceName];
-
-			if (null == _cryptoConfiguration.StepFormat && null == _cryptoConfiguration.EndFormat)
-			{
-				throw new System.InvalidOperationException("StepFormat and EndFormat cannot be both null.");
-			}
 		}
 
 		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetPrice(System.DateOnly date, System.Int32 hour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
@@ -53,7 +48,7 @@
 				_logger.LogInformation("Price fetched from external API.");
 				priceDTO = ConvertDTO(externalDTO, date, hour, financialInstrumentName);
 
-				await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(source.Id, System.DateOnly.FromDateTime(priceDTO.DateAndHour), priceDTO.DateAndHour.Hour, priceDTO.FinancialInstrumentName, priceDTO.ClosePrice));
+				await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(source.Id, System.DateOnly.FromDateTime(priceDTO.DateAndHour), priceDTO.DateAndHour.Hour, priceDTO.FinancialInstrument, priceDTO.ClosePrice));
 			}
 			else
 			{
@@ -61,7 +56,7 @@
 				priceDTO = new CryptoPriceAPI.DTOs.PriceDTO
 				{
 					DateAndHour = price.DateAndHour,
-					FinancialInstrumentName = financialInstrumentName,
+					FinancialInstrument = financialInstrumentName,
 					ClosePrice = price.ClosePrice,
 				};
 			}
@@ -76,13 +71,11 @@
 			System.DateTime dateHour = date.ToDateTime(new TimeOnly(hour, 0));
 
 			System.Int64 startTime = ((DateTimeOffset)dateHour).ToUnixTimeSeconds();
-			System.Int64? step = null == _cryptoConfiguration.StepFormat ? null : 3600;
 			System.Int64? endTime = null == _cryptoConfiguration.EndFormat ? null : startTime + 3600;
 
 			if (_cryptoConfiguration.TimeFormat == CryptoPriceAPI.Services.Configuration.TimeFormat.Milliseconds)
 			{
 				startTime *= 1000;
-				step *= 1000;
 				endTime *= 1000;
 			}
 
@@ -101,10 +94,6 @@
 			if (null != _cryptoConfiguration.EndFormat)
 			{
 				queryParams.Add(System.String.Format(_cryptoConfiguration.EndFormat, endTime!.Value));
-			}
-			else
-			{
-				queryParams.Add(System.String.Format(_cryptoConfiguration.StepFormat!, step!.Value));
 			}
 			queryParams.Add(System.String.Format(_cryptoConfiguration.LimitFormat, limit));
 
@@ -138,7 +127,7 @@
 			return new CryptoPriceAPI.DTOs.PriceDTO
 			{
 				DateAndHour = dateAndHour,
-				FinancialInstrumentName = financialInstrumentName,
+				FinancialInstrument = financialInstrumentName,
 				ClosePrice = externalDTO.GetCloseOHCL()
 			};
 		}

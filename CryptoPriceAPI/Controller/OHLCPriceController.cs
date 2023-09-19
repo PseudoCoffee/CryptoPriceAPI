@@ -24,9 +24,15 @@
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
+		/// <summary>
+		/// Get close candle price of BTCUSD from <paramref name="dateOnly"/> at end of <paramref name="hour"/> over the span of an hour aggregated from multiple sources.
+		/// </summary>
+		/// <param name="dateOnly">Date of the candle price</param>
+		/// <param name="hour">Starting hour of the candle price</param>
+		/// <returns></returns>
 		[Microsoft.AspNetCore.Mvc.HttpGet]
 		[Microsoft.AspNetCore.Mvc.Route("GetOHLCPrice")]
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetOHLCPrice(System.DateOnly dateOnly, System.Int32 hour)
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetOHLCPrice(System.DateOnly dateOnly, [System.ComponentModel.DataAnnotations.Range(0, 23)] System.Int32 hour)
 		{
 			_logger.LogInformation("GetOHLCPrice({@0}, {@1})", dateOnly, hour);
 

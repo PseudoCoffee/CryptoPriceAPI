@@ -14,7 +14,7 @@
 				throw new ArgumentException("Cannot aggregate functions with different timestamps.");
 			}
 
-			if (prices.Select(price => price.FinancialInstrumentName).Distinct().Count() != 1)
+			if (prices.Select(price => price.FinancialInstrument).Distinct().Count() != 1)
 			{
 				throw new ArgumentException("Cannot aggregate functions with different financial instrument name.");
 			}
@@ -22,7 +22,7 @@
 			CryptoPriceAPI.DTOs.PriceDTO priceDTO = new()
 			{
 				DateAndHour = prices.First().DateAndHour,
-				FinancialInstrumentName = prices.First().FinancialInstrumentName,
+				FinancialInstrument = prices.First().FinancialInstrument,
 				ClosePrice = prices.Average(price => price.ClosePrice)
 			};
 
