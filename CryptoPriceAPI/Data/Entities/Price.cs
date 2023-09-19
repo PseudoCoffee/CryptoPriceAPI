@@ -6,7 +6,7 @@
 	{
 		public required System.Guid SourceId { get; set; }
 
-		public long DateAndHourTicks { get; private set; }
+		public System.Int64 DateAndHourTicks { get; private set; }
 
 		[System.ComponentModel.DataAnnotations.Schema.NotMapped]
 		public System.DateTime DateAndHour

@@ -3,28 +3,41 @@
 	[Microsoft.AspNetCore.Mvc.ApiController]
 	public class OHLCPriceController : Microsoft.AspNetCore.Mvc.ControllerBase
 	{
-		private readonly CryptoPriceAPI.Services.Interfaces.ICryptoService<CryptoPriceAPI.DTOs.BitstampDTO> _bitstampService;
+		private readonly System.Collections.Generic.IEnumerable<CryptoPriceAPI.Services.Interfaces.ICryptoService> _externalServices;
+		private readonly CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> _aggregationService;
+
 		private readonly Microsoft.Extensions.Logging.ILogger<OHLCPriceController> _logger;
 
-		public OHLCPriceController(CryptoPriceAPI.Services.Interfaces.ICryptoService<CryptoPriceAPI.DTOs.BitstampDTO> bitstampService, Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger)
+		public OHLCPriceController(
+			CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitstampDTO> bitstampService,
+			CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitfinexDTO> bitfinexService,
+			CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> aggregationService,
+			Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger)
 		{
-			_bitstampService = bitstampService;
-			_logger = logger;
+			_externalServices = new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService>()
+			{
+				bitstampService ?? throw new ArgumentNullException(nameof(bitstampService)),
+				bitfinexService ?? throw new ArgumentNullException(nameof(bitfinexService))
+			};
+
+			_aggregationService = aggregationService ?? throw new ArgumentNullException(nameof(aggregationService));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		[Microsoft.AspNetCore.Mvc.HttpGet]
 		[Microsoft.AspNetCore.Mvc.Route("GetOHLCPrice")]
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetOHLCPrice()
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetOHLCPrice(System.DateOnly dateOnly, System.Int32 hour)
 		{
-			_logger.LogInformation("GetOHLCPrice()");
+			_logger.LogInformation("GetOHLCPrice({@0}, {@1})", dateOnly, hour);
 
-			System.DateOnly dateOnly = new(2023, 1, 1);
-			System.Int32 hour = 0;
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
+			System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO> prices = new();
 
-			var result = await _bitstampService.GetPrice(dateOnly, hour, financialInstrument);
-			
-			return result;
+			foreach (CryptoPriceAPI.Services.Interfaces.ICryptoService externalService in _externalServices)
+			{
+				prices.Add(await externalService.GetPrice(dateOnly, hour));
+			}
+
+			return _aggregationService.Aggregate(prices);
 		}
 	}
 }

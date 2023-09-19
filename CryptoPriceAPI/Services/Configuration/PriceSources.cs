@@ -10,6 +10,10 @@
 	{
 		public required System.String CandleUrlFormat { get; set; }
 
+		public required System.Boolean UppercaseFinancialInstrument { get; set; }
+
+		public System.Boolean TimeOffset {  get; set; }
+
 		public required System.String StartFormat { get; set; }
 
 		public System.String? EndFormat { get; set; } = default;
@@ -23,6 +27,5 @@
 
 	public class PriceSources : System.Collections.Generic.Dictionary<System.String, CryptoConfiguration>
 	{
-		//public System.Collections.Generic.Dictionary<System.String, CryptoConfiguration> Values { get; set; } = new();
 	}
 }

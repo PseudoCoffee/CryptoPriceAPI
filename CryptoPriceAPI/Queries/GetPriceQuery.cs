@@ -32,7 +32,9 @@ namespace CryptoPriceAPI.Queries
 
 		public async Task<CryptoPriceAPI.Data.Entities.Price?> Handle(GetPriceQuery request, CancellationToken cancellationToken)
 		{
-			DateTime dateHour = request.DateOnly.ToDateTime(new TimeOnly(request.Hour, 0));
+			System.DateTime dateHour = request.DateOnly.ToDateTime(new TimeOnly(request.Hour, 0));
+
+			var all = _queryContext.Prices.ToList();
 
 			return await _queryContext.Prices.FirstOrDefaultAsync(price => 
 					price.SourceId == request.SourceId && 
