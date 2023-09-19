@@ -6,7 +6,7 @@
 		{
 			if (null == prices || !prices.Any())
 			{
-				throw new ArgumentNullException(nameof(prices));
+				throw new InvalidOperationException($"{nameof(prices)} is null or contains no elements.");
 			}
 
 			if (prices.Select(price => price.DateAndHour).Distinct().Count() != 1)

@@ -9,19 +9,20 @@
 		private readonly Microsoft.Extensions.Logging.ILogger<OHLCPriceController> _logger;
 
 		public OHLCPriceController(
-			CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitstampDTO> bitstampService,
-			CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitfinexDTO> bitfinexService,
 			CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> aggregationService,
-			Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger)
+			Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger,
+			System.Collections.Generic.IEnumerable<CryptoPriceAPI.Services.Interfaces.ICryptoService> externalServices
+			)
 		{
-			_externalServices = new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService>()
-			{
-				bitstampService ?? throw new ArgumentNullException(nameof(bitstampService)),
-				bitfinexService ?? throw new ArgumentNullException(nameof(bitfinexService))
-			};
-
 			_aggregationService = aggregationService ?? throw new ArgumentNullException(nameof(aggregationService));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+			if (null == externalServices || !externalServices.Any()) 
+			{
+				throw new InvalidOperationException($"{nameof(externalServices)} is null or contains no elements.");
+			}
+
+			_externalServices = externalServices;
 		}
 
 		/// <summary>
@@ -31,10 +32,10 @@
 		/// <param name="hour">Starting hour of the candle price</param>
 		/// <returns></returns>
 		[Microsoft.AspNetCore.Mvc.HttpGet]
-		[Microsoft.AspNetCore.Mvc.Route("GetOHLCPrice")]
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetOHLCPrice(System.DateOnly dateOnly, [System.ComponentModel.DataAnnotations.Range(0, 23)] System.Int32 hour)
+		[Microsoft.AspNetCore.Mvc.Route("GetCandleClosePrice")]
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetCandleClosePrice(System.DateOnly dateOnly, [System.ComponentModel.DataAnnotations.Range(0, 23)] System.Int32 hour)
 		{
-			_logger.LogInformation("GetOHLCPrice({@0}, {@1})", dateOnly, hour);
+			_logger.LogInformation("GetCandleClosePrice({@0}, {@1})", dateOnly, hour);
 
 			System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO> prices = new();
 

@@ -25,14 +25,15 @@ namespace CryptoPriceAPI
 
 			builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(Program).Assembly));
 
-			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitstampDTO>, CryptoPriceAPI.Services.BitstampService>((serviceProvider) =>
+			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.ICryptoService, CryptoPriceAPI.Services.BitstampService>((serviceProvider) =>
 			{
 				return ActivatorUtilities.CreateInstance<CryptoPriceAPI.Services.BitstampService>(serviceProvider, "bitstamp");
 			});
-			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitfinexDTO>, CryptoPriceAPI.Services.BitfinexService>((serviceProvider) =>
+			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.ICryptoService, CryptoPriceAPI.Services.BitfinexService>((serviceProvider) =>
 			{
 				return ActivatorUtilities.CreateInstance<CryptoPriceAPI.Services.BitfinexService>(serviceProvider, "bitfinex");
 			});
+
 			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AggregationService>();
 
 			builder.Services.AddControllers();
