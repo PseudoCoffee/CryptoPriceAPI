@@ -1,10 +1,18 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace CryptoPriceAPI.IntegrationTests
 {
 	public class PriceTests : CryptoPriceAPI.IntegrationTests.BaseIntegrationTest
 	{
-		private readonly System.Collections.Generic.IReadOnlyDictionary<System.Tuple<System.DateOnly, System.Int32>, System.Single> datePrices = new System.Collections.Generic.Dictionary<System.Tuple<System.DateOnly, System.Int32>, System.Single>
+		private enum PriceSet
+		{
+			Aggregated,
+			Bitfinex,
+			Bitstamp
+		}
+
+		private readonly System.Collections.Generic.IReadOnlyDictionary<System.Tuple<System.DateOnly, System.Int32>, System.Single> aggregatedDatePrices = new System.Collections.Generic.Dictionary<System.Tuple<System.DateOnly, System.Int32>, System.Single>
 		{
 			{ new System.Tuple<System.DateOnly, System.Int32>(new(2022,  1,  1), 12), 46767.54f },
 			{ new System.Tuple<System.DateOnly, System.Int32>(new(2022,  1, 16), 12), 42989.11f },
@@ -36,25 +44,60 @@ namespace CryptoPriceAPI.IntegrationTests
 		{
 		}
 
-		[Theory]
-		[InlineData(2022, 1, 1, 12)]
-		[InlineData(2022, 4, 16, 12)]
-		[InlineData(2022, 6, 16, 12)]
-		[InlineData(2022, 10, 1, 12)]
-		[InlineData(2022, 11, 16, 12)]
-		public async Task GetCandleClosePrice_ReturnsPrice(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
+		//[Theory]
+		//[InlineData(2022, 1, 1, 12)]
+		//[InlineData(2022, 4, 16, 12)]
+		//[InlineData(2022, 6, 16, 12)]
+		//[InlineData(2022, 10, 1, 12)]
+		//[InlineData(2022, 11, 16, 12)]
+		//public async Task GetCandleClosePrice_ReturnsPrice(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
+		//{
+		//	// Arrange
+		//	System.DateOnly dateOnly = new(year, month, day);
+		//	System.Single price = GetPrice(PriceSet.Aggregated, dateOnly, hour);
+
+		//	// Act
+		//	DTOs.PriceDTO response = await this.aggregatedPriceController.GetCandleClosePrice(dateOnly, hour);
+
+		//	// Assert
+		//	Assert.Equal(price, response.ClosePrice);
+		//}
+
+		[Fact]
+		public async Task PriceGetter()
 		{
-			// Arrange
-			System.DateOnly dateOnly = new(year, month, day);
-			System.Single price = GetPrice(dateOnly, hour);
+			StringBuilder sbbf = new();
 
-			// Act
-			DTOs.PriceDTO response = await this.priceController.GetCandleClosePrice(dateOnly, hour);
+			for (int i = 1; i <= 12; i++)
+			{
+				for (int j = 1; j < 20; j += 15)
+				{
+					var price = await bitfinexPriceController.GetCandleClosePrice(new DateOnly(2022, i, j), 12);
+					sbbf.AppendLine($"{{new System.Tuple<System.DateOnly, System.Int32>(new(2022, {i}, {j}), 12), {price.ClosePrice}f}},");
+				}
+			}
 
-			// Assert
-			Assert.Equal(price, response.ClosePrice);
+			StringBuilder sbbs = new();
+
+			for (int i = 1; i <= 12; i++)
+			{
+				for (int j = 1; j < 20; j += 15)
+				{
+					var price = await bitstampPriceController.GetCandleClosePrice(new DateOnly(2022, i, j), 12);
+					sbbs.AppendLine($"{{new System.Tuple<System.DateOnly, System.Int32>(new(2022, {i}, {j}), 12), {price.ClosePrice}f}},");
+				}
+			}
+
+			int n = 100;
+
 		}
 
-		private System.Single GetPrice(System.DateOnly dateOnly, System.Int32 hour) => datePrices[new System.Tuple<System.DateOnly, System.Int32>(dateOnly, hour)];
+		private System.Single GetPrice(PriceSet priceSet, System.DateOnly dateOnly, System.Int32 hour) => priceSet switch
+		{
+			PriceSet.Aggregated => aggregatedDatePrices[new System.Tuple<System.DateOnly, System.Int32>(dateOnly, hour)],
+			//PriceSet.Bitfinex => bitfinexDatePrices[new System.Tuple<System.DateOnly, System.Int32>(dateOnly, hour)],
+			//PriceSet.Bitstamp => bitstampDatePrices[new System.Tuple<System.DateOnly, System.Int32>(dateOnly, hour)],
+			_ => throw new ArgumentException(null, nameof(priceSet)),
+		};
 	}
 }

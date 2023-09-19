@@ -115,7 +115,15 @@
 				PropertyNameCaseInsensitive = true
 			};
 
-			ExternalDTO externalDTO = System.Text.Json.JsonSerializer.Deserialize<ExternalDTO>(jsonReply, options)!;
+			ExternalDTO externalDTO;
+			try
+			{
+				externalDTO = System.Text.Json.JsonSerializer.Deserialize<ExternalDTO>(jsonReply, options)!;
+			}
+			catch (Exception ex)
+			{
+				throw;
+			}
 
 			return externalDTO;
 		}
