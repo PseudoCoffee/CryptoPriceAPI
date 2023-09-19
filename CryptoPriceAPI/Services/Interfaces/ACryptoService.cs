@@ -70,7 +70,9 @@
 
 			System.DateTime dateHour = date.ToDateTime(new TimeOnly(hour, 0));
 
-			System.Int64 startTime = ((DateTimeOffset)dateHour).ToUnixTimeSeconds();
+			System.TimeSpan differenceToUTC = dateHour - dateHour.ToUniversalTime();
+
+			System.Int64 startTime = ((DateTimeOffset)dateHour.Add(differenceToUTC)).ToUnixTimeSeconds();
 			System.Int64? endTime = null == _cryptoConfiguration.EndFormat ? null : startTime + 3600;
 
 			if (_cryptoConfiguration.TimeFormat == CryptoPriceAPI.Services.Configuration.TimeFormat.Milliseconds)
