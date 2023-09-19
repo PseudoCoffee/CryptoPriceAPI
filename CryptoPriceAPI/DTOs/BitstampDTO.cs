@@ -1,13 +1,13 @@
-﻿namespace CryptoPriceAPI.DTOs
+﻿namespace CryptoPriceAPI.DTOs.Bitstamp
 {
 	public class BitstampDTO : CryptoPriceAPI.DTOs.Interfaces.IExternalDTO
 	{
-		public BitstampData Data { get; set; } = new BitstampData();
+		public Data Data { get; set; } = new Data();
 
 		public System.Single GetCloseOHCL() => Data.Ohlc[0].Close;
 	}
 
-	public class BitstampData
+	public class Data
 	{
 		public System.Collections.Generic.List<Ohlc> Ohlc { get; set; } = new();
 	}

@@ -1,6 +1,6 @@
 ﻿namespace CryptoPriceAPI.Services
 {
-	public class BitfinexService : CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitfinexDTO>
+	public class BitfinexService : CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.Bitfinex.BitfinexDTO>
 	{
 		public BitfinexService(
 			MediatR.IMediator mediator,

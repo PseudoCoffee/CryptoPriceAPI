@@ -1,4 +1,4 @@
-﻿namespace CryptoPriceAPI.DTOs
+﻿namespace CryptoPriceAPI.DTOs.Bitfinex
 {
 	public class BitfinexDTO : System.Collections.Generic.List<BitfinexData>, CryptoPriceAPI.DTOs.Interfaces.IExternalDTO
 	{

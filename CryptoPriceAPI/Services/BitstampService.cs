@@ -1,6 +1,6 @@
 ﻿namespace CryptoPriceAPI.Services
 {
-	public class BitstampService : CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.BitstampDTO>
+	public class BitstampService : CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.Bitstamp.BitstampDTO>
 	{
 		public BitstampService(
 			MediatR.IMediator mediator,
