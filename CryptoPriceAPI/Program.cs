@@ -56,7 +56,7 @@ namespace CryptoPriceAPI
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
-				app.UseSwaggerUI(options => options.RoutePrefix = System.String.Empty);
+				app.UseSwaggerUI();
 			}
 
 			app.UseAuthorization();

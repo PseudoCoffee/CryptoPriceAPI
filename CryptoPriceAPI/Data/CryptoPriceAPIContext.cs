@@ -16,6 +16,8 @@
 			modelBuilder.Entity<CryptoPriceAPI.Data.Entities.Source>()
 				.HasMany<CryptoPriceAPI.Data.Entities.Price>()
 				.WithOne()
+				.HasForeignKey(price => price.SourceId)
+				.HasPrincipalKey(source => source.Id)
 				.OnDelete(Microsoft.EntityFrameworkCore.DeleteBehavior.Cascade);
 		}
 

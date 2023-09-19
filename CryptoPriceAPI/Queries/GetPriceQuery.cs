@@ -4,17 +4,17 @@ namespace CryptoPriceAPI.Queries
 {
 	public class GetPriceQuery : MediatR.IRequest<CryptoPriceAPI.Data.Entities.Price?>
 	{
-		public System.String SourceName { get; set; }
+		public System.Guid SourceId { get; set; }
 
 		public System.DateOnly DateOnly { get; set; }
 
 		public System.Int32 Hour {  get; set; }
 
-		public CryptoPriceAPI.Data.Entities.FinancialInstrumentName FinancialInstrumentName { get; set; }
+		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrumentName { get; set; }
 
-		public GetPriceQuery(System.String sourceName, System.DateOnly dateOnly, System.Int32 hour, CryptoPriceAPI.Data.Entities.FinancialInstrumentName financialInstrumentName)
+		public GetPriceQuery(System.Guid sourceId, System.DateOnly dateOnly, System.Int32 hour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName)
 		{
-			SourceName = sourceName;
+			SourceId = sourceId;
 			DateOnly = dateOnly;
 			Hour = hour;
 			FinancialInstrumentName = financialInstrumentName;
@@ -35,8 +35,8 @@ namespace CryptoPriceAPI.Queries
 			DateTime dateHour = request.DateOnly.ToDateTime(new TimeOnly(request.Hour, 0));
 
 			return await _queryContext.Prices.FirstOrDefaultAsync(price => 
-					price.SourceName == request.SourceName && 
-					price.DateAndHour == dateHour && 
+					price.SourceId == request.SourceId && 
+					price.DateAndHourTicks == dateHour.Ticks && 
 					price.FinancialInstrumentName == request.FinancialInstrumentName,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}

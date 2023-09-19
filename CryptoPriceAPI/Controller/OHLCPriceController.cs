@@ -3,12 +3,12 @@
 	[Microsoft.AspNetCore.Mvc.ApiController]
 	public class OHLCPriceController : Microsoft.AspNetCore.Mvc.ControllerBase
 	{
-		private readonly CryptoPriceAPI.Services.Interfaces.ICryptoService<CryptoPriceAPI.DTOs.BitstampDTO> _bitstamp;
+		private readonly CryptoPriceAPI.Services.Interfaces.ICryptoService<CryptoPriceAPI.DTOs.BitstampDTO> _bitstampService;
 		private readonly Microsoft.Extensions.Logging.ILogger<OHLCPriceController> _logger;
 
-		public OHLCPriceController(CryptoPriceAPI.Services.Interfaces.ICryptoService<CryptoPriceAPI.DTOs.BitstampDTO> bitstamp, Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger)
+		public OHLCPriceController(CryptoPriceAPI.Services.Interfaces.ICryptoService<CryptoPriceAPI.DTOs.BitstampDTO> bitstampService, Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger)
 		{
-			_bitstamp = bitstamp;
+			_bitstampService = bitstampService;
 			_logger = logger;
 		}
 
@@ -20,10 +20,11 @@
 
 			System.DateOnly dateOnly = new(2023, 1, 1);
 			System.Int32 hour = 0;
-			CryptoPriceAPI.Data.Entities.FinancialInstrumentName financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrumentName.BTCUSD;
+			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
 
-			var ret = await _bitstamp.CallExternalAPI(dateOnly, hour, financialInstrument);
-			return null;
+			var result = await _bitstampService.GetPrice(dateOnly, hour, financialInstrument);
+			
+			return result;
 		}
 	}
 }

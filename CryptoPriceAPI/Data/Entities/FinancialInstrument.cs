@@ -1,6 +1,6 @@
 ﻿namespace CryptoPriceAPI.Data.Entities
 {
-	public enum FinancialInstrumentName
+	public enum FinancialInstrument
 	{
 		BTCUSD = 0,
 	}
