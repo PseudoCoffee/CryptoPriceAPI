@@ -1,0 +1,25 @@
+name: Testing
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test_integration:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Restore dependencies for Integration Tests
+      run: dotnet restore ./CryptoPriceAPI.IntegrationTests
+    - name: Build Integration Tests
+      run: dotnet build --no-restore ./CryptoPriceAPI.IntegrationTests
+    - name: Run Integration Tests
+      run: dotnet test --no-build --verbosity normal ./CryptoPriceAPI.IntegrationTests
