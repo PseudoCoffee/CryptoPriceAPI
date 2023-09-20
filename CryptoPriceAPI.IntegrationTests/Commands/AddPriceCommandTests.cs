@@ -1,38 +1,51 @@
-﻿namespace CryptoPriceAPI.IntegrationTests.Commands
+﻿using CryptoPriceAPI.Data.Entities;
+using CryptoPriceAPI.DTOs;
+using Microsoft.EntityFrameworkCore;
+using System;
+
+namespace CryptoPriceAPI.IntegrationTests.Commands
 {
 	public class AddPriceCommandTests : CryptoPriceAPI.IntegrationTests.Mediator.MediatorTests
 	{
 		public AddPriceCommandTests(CryptoPriceAPI.IntegrationTests.IntegrationTestWebAppFactory factory) : base(factory)
 		{
+			_cryptoPriceAPIContext.Prices.RemoveRange(_cryptoPriceAPIContext.Prices);
+
+			_cryptoPriceAPIContext.SaveChanges();
 		}
 
 		[Fact]
 		public async Task AddPriceCommand_AddsOne_SucceedsAsync()
 		{
 			// Arrange
-			System.Guid guid = _sources[0].Id;
-			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2022, 6, 15), 12);
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
-			System.Single closePrice = 40652.54f;
-
-			CryptoPriceAPI.Commands.AddPriceCommand request = new(guid, dateAndHour, financialInstrument, closePrice);
+			CryptoPriceAPI.Data.Entities.Price price = new()
+			{
+				SourceId = _sources[0].Id,
+				DateAndHour = new(new DateOnly(2022, 6, 15), 12),
+				FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+				ClosePrice = 40652.54f
+			};
 
 			// Act
-			await _mediator.Send(request);
+			await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(price.SourceId, price.DateAndHour, price.FinancialInstrument, price.ClosePrice));
 
 			// Assert
+			Assert.True(await _cryptoPriceAPIContext.Prices.AnyAsync(priceDB => priceDB.SourceId == price.SourceId && priceDB.DateAndHourTicks == price.DateAndHourTicks && priceDB.FinancialInstrument == price.FinancialInstrument));
 		}
 
 		[Fact]
 		public async Task AddPriceCommand_AddsTwoIdentical_Prices_FailsAsync()
 		{
 			// Arrange
-			System.Guid guid = _sources[1].Id;
-			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2022, 2, 21), 12);
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
-			System.Single closePrice = 40652.54f;
+			CryptoPriceAPI.Data.Entities.Price price = new()
+			{
+				SourceId = _sources[1].Id,
+				DateAndHour = new(new DateOnly(2022, 2, 21), 12),
+				FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+				ClosePrice = 40652.54f
+			};
 
-			CryptoPriceAPI.Commands.AddPriceCommand request = new(guid, dateAndHour, financialInstrument, closePrice);
+			CryptoPriceAPI.Commands.AddPriceCommand request = new(price.SourceId, price.DateAndHour, price.FinancialInstrument, price.ClosePrice);
 
 			// Act & Assert
 			await _mediator.Send(request);
@@ -43,37 +56,70 @@
 		public async Task AddPriceCommand_AddsTwoPrices_WithDifferent_SourceGuid_SucceedsAsync()
 		{
 			// Arrange
-			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2022, 7, 5), 12);
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
-			System.Single closePrice = 40652.54f;
-
-			CryptoPriceAPI.Commands.AddPriceCommand request0 = new(_sources[0].Id, dateAndHour, financialInstrument, closePrice);
-			CryptoPriceAPI.Commands.AddPriceCommand request1 = new(_sources[1].Id, dateAndHour, financialInstrument, closePrice);
+			System.Collections.Generic.List<CryptoPriceAPI.Data.Entities.Price> prices = new()
+			{
+				new ()
+				{
+					SourceId = _sources[0].Id,
+					DateAndHour = new(new DateOnly(2022, 7, 5), 12),
+					FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+					ClosePrice = 40652.54f
+				},
+				new ()
+				{
+					SourceId = _sources[1].Id,
+					DateAndHour = new(new DateOnly(2022, 7, 5), 12),
+					FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+					ClosePrice = 40652.54f
+				},
+			};
 
 			// Act 
-			await _mediator.Send(request0);
-			await _mediator.Send(request1);
+			foreach (CryptoPriceAPI.Data.Entities.Price price in prices)
+			{
+				await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(price.SourceId, price.DateAndHour, price.FinancialInstrument, price.ClosePrice));
+			}
 
 			// Assert
+			foreach (CryptoPriceAPI.Data.Entities.Price price in prices)
+			{
+				Assert.True(await _cryptoPriceAPIContext.Prices.AnyAsync(priceDB => priceDB.SourceId == price.SourceId && priceDB.DateAndHourTicks == price.DateAndHourTicks && priceDB.FinancialInstrument == price.FinancialInstrument));
+			}
 		}
 
 		[Fact]
 		public async Task AddPriceCommand_AddsTwoPrices_WithDifferent_DateAndHour_SucceedsAsync()
 		{
 			// Arrange
-			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour0 = new(new DateOnly(2022, 5, 21), 12);
-			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour1 = new(new DateOnly(2022, 11, 11), 12);
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
-			System.Single closePrice = 40652.54f;
-
-			CryptoPriceAPI.Commands.AddPriceCommand request0 = new(_sources[0].Id, dateAndHour0, financialInstrument, closePrice);
-			CryptoPriceAPI.Commands.AddPriceCommand request1 = new(_sources[0].Id, dateAndHour1, financialInstrument, closePrice);
+			System.Collections.Generic.List<CryptoPriceAPI.Data.Entities.Price> prices = new()
+			{
+				new ()
+				{
+					SourceId = _sources[0].Id,
+					DateAndHour = new(new DateOnly(2022, 5, 21), 12),
+					FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+					ClosePrice = 40652.54f
+				},
+				new ()
+				{
+					SourceId = _sources[1].Id,
+					DateAndHour = new(new DateOnly(2022, 11, 11), 12),
+					FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+					ClosePrice = 40652.54f
+				},
+			};
 
 			// Act 
-			await _mediator.Send(request0);
-			await _mediator.Send(request1);
+			foreach (CryptoPriceAPI.Data.Entities.Price price in prices)
+			{
+				await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(price.SourceId, price.DateAndHour, price.FinancialInstrument, price.ClosePrice));
+			}
 
 			// Assert
+			foreach (CryptoPriceAPI.Data.Entities.Price price in prices)
+			{
+				Assert.True(await _cryptoPriceAPIContext.Prices.AnyAsync(priceDB => price.SourceId == priceDB.SourceId && price.DateAndHourTicks == priceDB.DateAndHourTicks && price.FinancialInstrument == priceDB.FinancialInstrument));
+			}
 		}
 	}
 }

@@ -273,9 +273,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 			CryptoPriceAPI.DTOs.PriceDTO result = await bitfinexService.GetPriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
-			Assert.Equal(dateAndHour.DateTime, result.DateAndHour.DateTime);
-			Assert.Equal(financialInstrument, result.FinancialInstrument);
-			Assert.Equal(priceValue, result.ClosePrice);
+			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && priceValue == result.ClosePrice);
 		}
 
 		[Fact]
@@ -302,9 +300,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 			CryptoPriceAPI.DTOs.PriceDTO result = await bitfinexService.GetPriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
-			Assert.Equal(dateAndHour.DateTime, result.DateAndHour.DateTime);
-			Assert.Equal(financialInstrument, result.FinancialInstrument);
-			Assert.Equal(price.ClosePrice, result.ClosePrice);
+			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && price.ClosePrice == result.ClosePrice);
 		}
 
 		// No test can run without this
