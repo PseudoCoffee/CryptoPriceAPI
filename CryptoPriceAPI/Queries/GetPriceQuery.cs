@@ -32,7 +32,7 @@ namespace CryptoPriceAPI.Queries
 			return await _queryContext.Prices.FirstOrDefaultAsync(price =>
 					price.SourceId == request.SourceId &&
 					price.DateAndHourTicks == request.DateAndHour.DateTime.Ticks &&
-					price.FinancialInstrumentName == request.FinancialInstrumentName,
+					price.FinancialInstrument == request.FinancialInstrumentName,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}
 	}

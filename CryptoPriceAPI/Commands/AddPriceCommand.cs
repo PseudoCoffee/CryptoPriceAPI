@@ -37,7 +37,7 @@ namespace CryptoPriceAPI.Commands
 			{
 				SourceId = request.SourceId,
 				DateAndHour = request.DateAndHour,
-				FinancialInstrumentName = request.FinancialInstrumentName,
+				FinancialInstrument = request.FinancialInstrumentName,
 				ClosePrice = request.ClosePrice
 			};
 

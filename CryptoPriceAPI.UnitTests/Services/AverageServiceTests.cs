@@ -1,12 +1,18 @@
-﻿namespace CryptoPriceAPI.UnitTests.Services
+﻿using Moq;
+
+namespace CryptoPriceAPI.UnitTests.Services
 {
 	public class AverageServiceTests
 	{
 		private readonly CryptoPriceAPI.Services.AverageService averageService;
 
+		private readonly Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Services.AverageService>> mockLogger;
+
 		public AverageServiceTests()
 		{
-			averageService = new CryptoPriceAPI.Services.AverageService();
+			mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Services.AverageService>>();
+
+			averageService = new CryptoPriceAPI.Services.AverageService(mockLogger.Object);
 		}
 
 		[Theory]
@@ -14,7 +20,7 @@
 		[InlineData(2)]
 		[InlineData(4)]
 		[InlineData(5)]
-		public void Aggregate_Returns_AverageClosePrice(System.Int32 count)
+		public void Aggregate_Returns_AveragePrice(System.Int32 count)
 		{
 			// Arrange
 			System.Collections.Generic.IEnumerable<DTOs.PriceDTO> prices = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(count);

@@ -2,35 +2,22 @@
 {
 	public class ExternalAPICaller : CryptoPriceAPI.Services.Interfaces.IExternalAPICaller
 	{
-		protected readonly Microsoft.Extensions.Logging.ILogger<ExternalAPICaller> _logger;
+		private readonly Microsoft.Extensions.Logging.ILogger<ExternalAPICaller> _logger;
+		private readonly System.Net.Http.HttpMessageHandler _httpMessageHandler;
 
-		public ExternalAPICaller(Microsoft.Extensions.Logging.ILogger<ExternalAPICaller> logger)
+		public ExternalAPICaller(Microsoft.Extensions.Logging.ILogger<ExternalAPICaller> logger, System.Net.Http.HttpMessageHandler httpMessageHandler)
 		{
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+			_httpMessageHandler = httpMessageHandler;
 		}
 
-		public async Task<System.String> GetJSONResponseFrom(System.String url)
-		{
-			_logger.LogInformation("CallExternalAPI({@0})", url);
-
-			System.String jsonResponse;
-			using System.Net.Http.HttpClient client = new();
-			{
-				System.Net.Http.HttpResponseMessage reply = await client.GetAsync(url);
-
-				jsonResponse = await reply.Content.ReadAsStringAsync();
-			}
-
-			return jsonResponse;
-		}
-
-		public System.String PrepareURL(
+		public System.Uri GenerateUri(
 			CryptoPriceAPI.Services.Configuration.CryptoConfiguration cryptoConfiguration,
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour,
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
 			System.Int32 limit = 1)
 		{
-			_logger.LogInformation("PrepareURL({@0}, {@1}, {@2})", dateAndHour, financialInstrumentName, limit);
+			_logger.LogInformation("PrepareURL({@0}, {@1}, {@2})", dateAndHour, financialInstrument, limit);
 
 			System.DateTime dateHour = dateAndHour.DateTime;
 
@@ -45,7 +32,7 @@
 				endTime *= 1000;
 			}
 
-			System.String financialInstrumentNameString = financialInstrumentName.ToString();
+			System.String financialInstrumentNameString = financialInstrument.ToString();
 			financialInstrumentNameString =
 				cryptoConfiguration.UppercaseFinancialInstrument ?
 					financialInstrumentNameString.ToUpperInvariant() :
@@ -60,10 +47,29 @@
 			{
 				queryParams.Add(System.String.Format(cryptoConfiguration.EndFormat, endTime!.Value));
 			}
+
 			queryParams.Add(System.String.Format(cryptoConfiguration.LimitFormat, limit));
-			return System.String.Concat(
+
+			System.String urlString = System.String.Concat(
 				System.String.Format(cryptoConfiguration.CandleUrlFormat, financialInstrumentNameString),
 				System.String.Join('&', queryParams));
+
+			return new System.Uri(urlString);
+		}
+
+		public async Task<System.String> GetStringResponseFrom(System.Uri uri)
+		{
+			_logger.LogInformation("CallExternalAPI({@0})", uri);
+
+			System.String jsonResponse;
+			using System.Net.Http.HttpClient client = new(_httpMessageHandler);
+			{
+				System.Net.Http.HttpResponseMessage reply = await client.GetAsync(uri);
+
+				jsonResponse = await reply.Content.ReadAsStringAsync();
+			}
+
+			return jsonResponse;
 		}
 	}
 }

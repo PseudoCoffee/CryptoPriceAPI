@@ -1,7 +1,7 @@
 ﻿namespace CryptoPriceAPI.Data.Entities
 {
 	[System.ComponentModel.DataAnnotations.Schema.Table($"{nameof(Price)}s")]
-	[Microsoft.EntityFrameworkCore.PrimaryKey(nameof(SourceId), nameof(DateAndHourTicks), nameof(FinancialInstrumentName))]
+	[Microsoft.EntityFrameworkCore.PrimaryKey(nameof(SourceId), nameof(DateAndHourTicks), nameof(FinancialInstrument))]
 	public class Price
 	{
 		public required System.Guid SourceId { get; set; }
@@ -21,7 +21,7 @@
 			}
 		}
 
-		public required CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrumentName { get; set; }
+		public required CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrument { get; set; }
 
 		public required System.Single ClosePrice { get; set; }
 	}

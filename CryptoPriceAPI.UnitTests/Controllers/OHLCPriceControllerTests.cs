@@ -23,7 +23,7 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 		}
 
 		[Fact]
-		public async void GetCandleClosePrice_Returns_PriceDTO()
+		public async Task GetCandleClosePrice_Returns_PriceDTO()
 		{
 			// Arrange
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
@@ -46,7 +46,7 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 		}
 
 		[Fact]
-		public async void GetCandleClosePrice_Calls_CryptoService_Once()
+		public async Task GetCandleClosePrice_Calls_CryptoService_Once()
 		{
 			// Arrange
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
@@ -57,11 +57,11 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 			// Assert
 			mockCryptoService.Verify(service => service.GetPriceAsync(
 				It.IsAny<CryptoPriceAPI.Data.Entities.DateAndHour>(),
-				It.IsAny<CryptoPriceAPI.Data.Entities.FinancialInstrument>()), Moq.Times.Once);
+				It.IsAny<CryptoPriceAPI.Data.Entities.FinancialInstrument>()), Times.Once);
 		}
 
 		[Fact]
-		public async void GetCandleClosePrice_Calls_MockAggregationService_Once()
+		public async Task GetCandleClosePrice_Calls_MockAggregationService_Once()
 		{
 			// Arrange
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();

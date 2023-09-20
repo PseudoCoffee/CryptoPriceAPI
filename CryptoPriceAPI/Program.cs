@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using CryptoPriceAPI.Services.Helper;
+using Microsoft.Extensions.Http;
 
 namespace CryptoPriceAPI
 {
@@ -40,7 +41,8 @@ namespace CryptoPriceAPI
 			}
 
 			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AverageService>();
-			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IExternalAPICaller, CryptoPriceAPI.Services.ExternalAPICaller>();
+			builder.Services.AddTransient<System.Net.Http.HttpMessageHandler, System.Net.Http.HttpClientHandler>();
+			builder.Services.AddTransient<CryptoPriceAPI.Services.Interfaces.IExternalAPICaller, CryptoPriceAPI.Services.ExternalAPICaller>();
 
 			builder.Services.AddControllers().AddJsonOptions(config =>
 			{
