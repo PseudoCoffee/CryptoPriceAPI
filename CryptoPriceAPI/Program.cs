@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using CryptoPriceAPI.Services.Helper;
 
 namespace CryptoPriceAPI
 {
 	public class Program
 	{
-
-
 		public static void Main(string[] args)
 		{
 			Microsoft.AspNetCore.Builder.WebApplicationBuilder builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
@@ -26,14 +26,18 @@ namespace CryptoPriceAPI
 
 			builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(typeof(Program).Assembly));
 
-			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.ICryptoService, CryptoPriceAPI.Services.BitstampService>((serviceProvider) =>
+			System.Collections.Generic.IEnumerable<System.Type> types = Assembly.GetExecutingAssembly().GetTypes()
+				.Where(type => type.IsDefined(typeof(PriceSourceNameAttribute)));
+
+			foreach (System.Type type in types)
 			{
-				return ActivatorUtilities.CreateInstance<CryptoPriceAPI.Services.BitstampService>(serviceProvider, "bitstamp");
-			});
-			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.ICryptoService, CryptoPriceAPI.Services.BitfinexService>((serviceProvider) =>
-			{
-				return ActivatorUtilities.CreateInstance<CryptoPriceAPI.Services.BitfinexService>(serviceProvider, "bitfinex");
-			});
+				PriceSourceNameAttribute priceSourceNameAttribute = (PriceSourceNameAttribute)Attribute.GetCustomAttribute(type, typeof(PriceSourceNameAttribute))!;
+
+				builder.Services.AddScoped((serviceProvider) =>
+				{
+					return (Services.Interfaces.ICryptoService)ActivatorUtilities.CreateInstance(serviceProvider, type, priceSourceNameAttribute.PriceSourceKey);
+				});
+			}
 
 			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AverageService>();
 

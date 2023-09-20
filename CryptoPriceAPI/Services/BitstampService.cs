@@ -1,5 +1,6 @@
 ﻿namespace CryptoPriceAPI.Services
 {
+	[CryptoPriceAPI.Services.Helper.PriceSourceName(priceSourceKey: "bitstamp")]
 	public class BitstampService : CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.Bitstamp.BitstampDTO>
 	{
 		public BitstampService(

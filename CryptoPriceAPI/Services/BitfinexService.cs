@@ -1,5 +1,6 @@
 ﻿namespace CryptoPriceAPI.Services
 {
+	[CryptoPriceAPI.Services.Helper.PriceSourceName(priceSourceKey: "bitfinex")]
 	public class BitfinexService : CryptoPriceAPI.Services.Interfaces.ACryptoService<CryptoPriceAPI.DTOs.Bitfinex.BitfinexDTO>
 	{
 		public BitfinexService(
