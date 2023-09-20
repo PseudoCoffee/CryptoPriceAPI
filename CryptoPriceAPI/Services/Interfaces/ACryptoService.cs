@@ -1,4 +1,6 @@
-﻿namespace CryptoPriceAPI.Services.Interfaces
+﻿using CryptoPriceAPI.Data.Entities;
+
+namespace CryptoPriceAPI.Services.Interfaces
 {
 	public abstract class ACryptoService<ExternalDTO> : ICryptoService where ExternalDTO : CryptoPriceAPI.DTOs.Interfaces.IExternalDTO
 	{
@@ -15,24 +17,31 @@
 			System.String? sourceName,
 			Microsoft.Extensions.Options.IOptions<CryptoPriceAPI.Services.Configuration.PriceSources> options)
 		{
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
 			if (System.String.IsNullOrEmpty(sourceName))
 			{
-				throw new ArgumentException($"'{nameof(sourceName)}' cannot be null or empty.", nameof(sourceName));
+				ArgumentException exception = new($"'{nameof(sourceName)}' cannot be null or empty.", nameof(sourceName));
+				_logger.LogError(exception, "{@0}", exception.Message);
+
+				throw exception;
 			}
 
 			if (options is null)
 			{
-				throw new ArgumentNullException(nameof(options));
+				ArgumentNullException exception = new(nameof(options));
+				_logger.LogError(exception, "{@0}", exception.Message);
+
+				throw exception;
 			}
 
-			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 			_mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
 			_externalAPICaller = externalAPICaller ?? throw new ArgumentNullException(nameof(externalAPICaller));
 			_sourceName = sourceName;
 			_cryptoConfiguration = options.Value[sourceName];
 		}
 
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetPriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetCandleClosePriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
 		{
 			_logger.LogInformation("GetPriceAsync({@0})", dateAndHour);
 
@@ -80,6 +89,11 @@
 			return priceDTO;
 		}
 
+		/// <summary>
+		/// Format given <paramref name="jsonDTO"/> to <typeparamref name="ExternalDTO"/>. 
+		/// </summary>
+		/// <param name="jsonDTO"> String in json format to be deserialized. </param>
+		/// <returns> <typeparamref name="ExternalDTO"/> containing the information of <paramref name="jsonDTO"/>. </returns>
 		private ExternalDTO ConvertJsonToExternalDTO(System.String jsonDTO)
 		{
 			_logger.LogInformation("ConvertJsonToDTO({@0})", jsonDTO);
@@ -104,6 +118,13 @@
 			return externalDTO;
 		}
 
+		/// <summary>
+		/// Convert <paramref name="externalDTO"/> of the format used by external API to <see cref="CryptoPriceAPI.DTOs.PriceDTO"/>.
+		/// </summary>
+		/// <param name="externalDTO"> Object containing the price information. </param>
+		/// <param name="dateAndHour"> Starting date and hour of the price. </param>
+		/// <param name="financialInstrument"> Financial instrument name of the price (e.g.: BTCUSD, BTCEUR). </param>
+		/// <returns> <see cref="CryptoPriceAPI.DTOs.PriceDTO"/> containg all the information of <paramref name="externalDTO"/>. </returns>
 		private CryptoPriceAPI.DTOs.PriceDTO ConvertExternalDTOToPriceDTO(ExternalDTO externalDTO, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
 		{
 			_logger.LogInformation("ConvertExternalDTOToPriceDTO({@0}, {@1})", dateAndHour, financialInstrument);

@@ -29,7 +29,7 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
 
 			mockCryptoService
-				.Setup(service => service.GetPriceAsync(
+				.Setup(service => service.GetCandleClosePriceAsync(
 					It.Is<CryptoPriceAPI.Data.Entities.DateAndHour>(dah => dah.DateTime == price.DateAndHour.DateTime),
 					It.Is<CryptoPriceAPI.Data.Entities.FinancialInstrument>(f => f == CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)))
 				.ReturnsAsync(price);
@@ -55,7 +55,7 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 			await ohlcPriceController.GetCandleClosePriceAsync(price.DateAndHour.DateOnly, price.DateAndHour.Hour);
 
 			// Assert
-			mockCryptoService.Verify(service => service.GetPriceAsync(
+			mockCryptoService.Verify(service => service.GetCandleClosePriceAsync(
 				It.IsAny<CryptoPriceAPI.Data.Entities.DateAndHour>(),
 				It.IsAny<CryptoPriceAPI.Data.Entities.FinancialInstrument>()), Times.Once);
 		}

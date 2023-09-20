@@ -30,7 +30,7 @@
 		/// </summary>
 		/// <param name="dateOnly">Date of the candle price</param>
 		/// <param name="hour">Starting hour of the candle price</param>
-		/// <returns></returns>
+		/// <returns> An aggregated price of multiple sources from same date and hour. </returns>
 		[Microsoft.AspNetCore.Mvc.HttpGet]
 		[Microsoft.AspNetCore.Mvc.Route("GetCandleClosePrice")]
 		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetCandleClosePriceAsync(System.DateOnly dateOnly, [System.ComponentModel.DataAnnotations.Range(0, 23)] System.Int32 hour)
@@ -43,7 +43,7 @@
 
 			foreach (CryptoPriceAPI.Services.Interfaces.ICryptoService externalService in _externalServices)
 			{
-				prices.Add(await externalService.GetPriceAsync(dateAndHour));
+				prices.Add(await externalService.GetCandleClosePriceAsync(dateAndHour));
 			}
 
 			return _aggregationService.Aggregate(prices);

@@ -13,6 +13,13 @@ namespace CryptoPriceAPI.Commands
 
 		public System.Single ClosePrice { get; set; }
 
+		/// <summary>
+		/// Inserts OHLC candle price to database.
+		/// </summary>
+		/// <param name="sourceId"> Id of the price source. </param>
+		/// <param name="dateAndHour"> Starting date and hour of the price. </param>
+		/// <param name="financialInstrument"> Financial instrument name of the price (e.g.: BTCUSD, BTCEUR). </param>
+		/// <param name="closePrice"> Close price of the OHLC candle. </param>
 		public AddPriceCommand(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument, System.Single closePrice)
 		{
 			SourceId = sourceId;

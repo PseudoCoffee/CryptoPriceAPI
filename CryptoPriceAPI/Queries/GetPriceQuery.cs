@@ -10,6 +10,12 @@ namespace CryptoPriceAPI.Queries
 
 		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrument { get; set; }
 
+		/// <summary>
+		/// Get OHLC close price
+		/// </summary>
+		/// <param name="sourceId"> Id of the related price source. </param>
+		/// <param name="dateAndHour"> Starting date and hour of the price. </param>
+		/// <param name="financialInstrument"> Financial instrument name of the price (e.g.: BTCUSD, BTCEUR). </param>
 		public GetPriceQuery(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument)
 		{
 			SourceId = sourceId;

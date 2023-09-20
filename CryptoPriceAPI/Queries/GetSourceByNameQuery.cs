@@ -8,6 +8,10 @@ namespace CryptoPriceAPI.Queries
 	{
 		public System.String Name { get; set; }
 
+		/// <summary>
+		/// Get price source by name.
+		/// </summary>
+		/// <param name="name"> Name of the source. </param>
 		public GetSourceByNameQuery(System.String name)
 		{
 			Name = name;

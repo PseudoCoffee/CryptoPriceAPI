@@ -72,7 +72,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(source);
 
 			// Act
-			await bitstampService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetCandleClosePriceAsync(dateAndHour);
 
 			// Assert
 			mockMediator.Verify(service => service.Send(It.IsAny<CryptoPriceAPI.Queries.GetSourceByNameQuery>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
@@ -91,7 +91,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync((CryptoPriceAPI.Data.Entities.Source?)null);
 
 			// Act & Assert
-			NullReferenceException exception = await Assert.ThrowsAsync<NullReferenceException>(async () => await bitstampService.GetPriceAsync(dateAndHour));
+			NullReferenceException exception = await Assert.ThrowsAsync<NullReferenceException>(async () => await bitstampService.GetCandleClosePriceAsync(dateAndHour));
 			Assert.Equal("source", exception.Message);
 		}
 
@@ -110,7 +110,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(source);
 
 			// Act
-			await bitstampService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetCandleClosePriceAsync(dateAndHour);
 
 			// Assert
 			mockMediator.Verify(service => service.Send(It.IsAny<CryptoPriceAPI.Queries.GetPriceQuery>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
@@ -144,7 +144,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.Returns(uri);
 
 			// Act
-			await bitstampService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetCandleClosePriceAsync(dateAndHour);
 
 			// Assert
 			mockExternalAPICaller.Verify(service => service.GenerateUri(
@@ -188,7 +188,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			await bitstampService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetCandleClosePriceAsync(dateAndHour);
 
 			// Assert
 			mockExternalAPICaller.Verify(service => service.GetStringResponseFrom(It.Is<System.Uri>(_uri => _uri == uri)), Times.Once);
@@ -227,7 +227,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			await bitstampService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetCandleClosePriceAsync(dateAndHour);
 
 			// Assert
 			mockMediator.Verify(service => service.Send(It.IsAny<CryptoPriceAPI.Commands.AddPriceCommand>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
@@ -268,7 +268,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetPriceAsync(dateAndHour, financialInstrument);
+			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetCandleClosePriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
 			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && priceValue == result.ClosePrice);
@@ -295,7 +295,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(price);
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetPriceAsync(dateAndHour, financialInstrument);
+			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetCandleClosePriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
 			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && price.ClosePrice == result.ClosePrice);
