@@ -1,4 +1,4 @@
-﻿namespace CryptoPriceAPI.Controller
+﻿namespace CryptoPriceAPI.Controllers
 {
 	[Microsoft.AspNetCore.Mvc.ApiController]
 	public class OHLCPriceController : Microsoft.AspNetCore.Mvc.ControllerBase

@@ -5,7 +5,7 @@
 		public System.Uri GenerateUri(
 			CryptoPriceAPI.Services.Configuration.CryptoConfiguration cryptoConfiguration,
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour,
-			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
+			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
 			System.Int32 limit = 1);
 		public Task<System.String> GetStringResponseFrom(System.Uri url);
 	}

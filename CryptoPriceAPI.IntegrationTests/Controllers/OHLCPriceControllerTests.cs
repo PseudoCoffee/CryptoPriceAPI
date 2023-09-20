@@ -1,9 +1,6 @@
-﻿using System;
-using System.Text;
-
-namespace CryptoPriceAPI.IntegrationTests
+﻿namespace CryptoPriceAPI.IntegrationTests.Controllers
 {
-	public class PriceTests : CryptoPriceAPI.IntegrationTests.BaseIntegrationTest
+	public class OHLCPriceControllerTests : CryptoPriceAPI.IntegrationTests.Controllers.Interfaces.AControllerTests
 	{
 		private enum PriceSet
 		{
@@ -96,9 +93,8 @@ namespace CryptoPriceAPI.IntegrationTests
 			{ new System.Tuple<System.DateOnly, System.Int32>(new(2022, 12, 16), 12), 16947f}
 		};
 
-		public PriceTests(CryptoPriceAPI.IntegrationTests.IntegrationTestWebAppFactory factory) : base(factory)
+		public OHLCPriceControllerTests(CryptoPriceAPI.IntegrationTests.IntegrationTestWebAppFactory factory) : base(factory)
 		{
-
 		}
 
 		[Theory]
@@ -107,7 +103,7 @@ namespace CryptoPriceAPI.IntegrationTests
 		[InlineData(2022, 6, 16, 12)]
 		[InlineData(2022, 10, 1, 12)]
 		[InlineData(2022, 11, 16, 12)]
-		public async Task GetCandleClosePrice_ReturnsAggregatedPrice(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
+		public async Task GetCandleClosePrice_ReturnsAggregatedPriceAsync(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
 		{
 			// Arrange
 			System.DateOnly dateOnly = new(year, month, day);
@@ -126,7 +122,7 @@ namespace CryptoPriceAPI.IntegrationTests
 		[InlineData(2022, 6, 16, 12)]
 		[InlineData(2022, 10, 1, 12)]
 		[InlineData(2022, 11, 16, 12)]
-		public async Task GetCandleClosePrice_ReturnsBitfinexPrice(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
+		public async Task GetCandleClosePrice_ReturnsBitfinexPriceAsync(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
 		{
 			// Arrange
 			System.DateOnly dateOnly = new(year, month, day);
@@ -145,7 +141,7 @@ namespace CryptoPriceAPI.IntegrationTests
 		[InlineData(2022, 6, 16, 12)]
 		[InlineData(2022, 10, 1, 12)]
 		[InlineData(2022, 11, 16, 12)]
-		public async Task GetCandleClosePrice_ReturnsBitstampPrice(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
+		public async Task GetCandleClosePrice_ReturnsBitstampPriceAsync(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
 		{
 			// Arrange
 			System.DateOnly dateOnly = new(year, month, day);

@@ -1,8 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Collections.Generic;
-using System;
-
-namespace CryptoPriceAPI.Services.Interfaces
+﻿namespace CryptoPriceAPI.Services.Interfaces
 {
 	public abstract class ACryptoService<ExternalDTO> : ICryptoService where ExternalDTO : CryptoPriceAPI.DTOs.Interfaces.IExternalDTO
 	{
@@ -36,7 +32,7 @@ namespace CryptoPriceAPI.Services.Interfaces
 			_cryptoConfiguration = options.Value[sourceName];
 		}
 
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetPriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetPriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
 		{
 			_logger.LogInformation("GetPriceAsync({@0})", dateAndHour);
 
@@ -50,13 +46,13 @@ namespace CryptoPriceAPI.Services.Interfaces
 				throw exception;
 			}
 
-			CryptoPriceAPI.Data.Entities.Price? price = await _mediator.Send(new CryptoPriceAPI.Queries.GetPriceQuery(source.Id, dateAndHour, financialInstrumentName));
+			CryptoPriceAPI.Data.Entities.Price? price = await _mediator.Send(new CryptoPriceAPI.Queries.GetPriceQuery(source.Id, dateAndHour, financialInstrument));
 			CryptoPriceAPI.DTOs.PriceDTO priceDTO;
 
 			if (null == price)
 			{
 				_logger.LogInformation("No price found in database.{@0}Build url for external api.", System.Environment.NewLine);
-				System.Uri uri = _externalAPICaller.GenerateUri(_cryptoConfiguration, dateAndHour, financialInstrumentName);
+				System.Uri uri = _externalAPICaller.GenerateUri(_cryptoConfiguration, dateAndHour, financialInstrument);
 
 				_logger.LogInformation("Call external API for price.");
 				System.String jsonResponse = await _externalAPICaller.GetStringResponseFrom(uri);
@@ -65,7 +61,7 @@ namespace CryptoPriceAPI.Services.Interfaces
 				ExternalDTO externalDTO = ConvertJsonToExternalDTO(jsonResponse);
 
 				_logger.LogInformation("Convert externalDTO to priceDTO.");
-				priceDTO = ConvertExternalDTOToPriceDTO(externalDTO, dateAndHour, financialInstrumentName);
+				priceDTO = ConvertExternalDTOToPriceDTO(externalDTO, dateAndHour, financialInstrument);
 
 				_logger.LogInformation("Cache the price in the DB.");
 				await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(source.Id, priceDTO.DateAndHour, priceDTO.FinancialInstrument, priceDTO.ClosePrice));
@@ -76,7 +72,7 @@ namespace CryptoPriceAPI.Services.Interfaces
 				priceDTO = new CryptoPriceAPI.DTOs.PriceDTO
 				{
 					DateAndHour = price.DateAndHour,
-					FinancialInstrument = financialInstrumentName,
+					FinancialInstrument = financialInstrument,
 					ClosePrice = price.ClosePrice,
 				};
 			}
@@ -108,13 +104,13 @@ namespace CryptoPriceAPI.Services.Interfaces
 			return externalDTO;
 		}
 
-		private CryptoPriceAPI.DTOs.PriceDTO ConvertExternalDTOToPriceDTO(ExternalDTO externalDTO, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
+		private CryptoPriceAPI.DTOs.PriceDTO ConvertExternalDTOToPriceDTO(ExternalDTO externalDTO, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
 		{
-			_logger.LogInformation("ConvertExternalDTOToPriceDTO({@0}, {@1})", dateAndHour, financialInstrumentName);
+			_logger.LogInformation("ConvertExternalDTOToPriceDTO({@0}, {@1})", dateAndHour, financialInstrument);
 			return new CryptoPriceAPI.DTOs.PriceDTO
 			{
 				DateAndHour = dateAndHour,
-				FinancialInstrument = financialInstrumentName,
+				FinancialInstrument = financialInstrument,
 				ClosePrice = externalDTO.GetCloseOHCL()
 			};
 		}

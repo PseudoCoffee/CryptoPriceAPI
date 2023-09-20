@@ -60,7 +60,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_CallsMediator_GetSourceByNameQuery_Once()
+		public async void GetPriceAsync_CallsMediator_GetSourceByNameQuery_OnceAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -81,7 +81,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async Task GetPriceAsync_Throws_NullReferenceException_SourceAsync()
+		public async Task GetPriceAsync_Throws_NullReferenceException_SourceAsyncAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -98,7 +98,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_CallsMediator_GetPriceQuery_Once()
+		public async void GetPriceAsync_CallsMediator_GetPriceQuery_OnceAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -119,7 +119,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_PriceNotInDB_CallsExternalAPI_GenerateUri_Once()
+		public async void GetPriceAsync_PriceNotInDB_CallsExternalAPI_GenerateUri_OnceAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -158,7 +158,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_PriceNotInDB_CallsExternalAPI_GetStringResponseFrom_Once()
+		public async void GetPriceAsync_PriceNotInDB_CallsExternalAPI_GetStringResponseFrom_OnceAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -197,7 +197,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_PriceNotInDB_CallsMediator_AddPriceCommand()
+		public async void GetPriceAsync_PriceNotInDB_CallsMediator_AddPriceCommandAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -236,7 +236,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_PriceNotInDB_ReturnsCorrectPriceDTO()
+		public async void GetPriceAsync_PriceNotInDB_ReturnsCorrectPriceDTOAsync()
 		{
 			// Arrange
 			SetupDefaultReturnStringForExternalApiCaller();
@@ -279,7 +279,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async void GetPriceAsync_PriceInDB_ReturnsSamePriceDTOAsInDB()
+		public async void GetPriceAsync_PriceInDB_ReturnsSamePriceDTOAsInDBAsync()
 		{
 			// Arrange
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
@@ -306,40 +306,6 @@ namespace CryptoPriceAPI.UnitTests.Services
 			Assert.Equal(financialInstrument, result.FinancialInstrument);
 			Assert.Equal(price.ClosePrice, result.ClosePrice);
 		}
-		//[Fact]
-		//public async void GetPriceAsync_CallsExternalAPI_GenerateUri_Once()
-		//{
-		//	// Arrange
-		//	CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
-		//	CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
-		//	source.Name = sourceName;
-		//	System.Uri uri = new("https://www.test.com");
-		//	System.String replyMessage = "{ \"hello\": \"world\" }";
-
-		//	mockMediator
-		//		.Setup(mediator => mediator.Send(It.IsAny<CryptoPriceAPI.Queries.GetSourceByNameQuery>(), It.IsAny<System.Threading.CancellationToken>()))
-		//		.ReturnsAsync(source);
-
-		//	mockMediator
-		//		.Setup(mediator => mediator.Send(It.IsAny<CryptoPriceAPI.Queries.GetPriceQuery>(), It.IsAny<System.Threading.CancellationToken>()))
-		//		.ReturnsAsync((CryptoPriceAPI.Data.Entities.Price?)null);
-
-		//	mockExternalAPICaller
-		//		.Setup(externalAPICaller => externalAPICaller.GenerateUri(
-		//			It.Is<CryptoPriceAPI.Services.Configuration.CryptoConfiguration>(cc => cc == cryptoConfiguration),
-		//			It.Is<CryptoPriceAPI.Data.Entities.DateAndHour>(dah => dah == dateAndHour),
-		//			It.IsAny<CryptoPriceAPI.Data.Entities.FinancialInstrument>(),
-		//			It.IsAny<System.Int32>()))
-		//		.Returns(uri);
-
-		//	mockExternalAPICaller
-		//		.Setup(externalAPICaller => externalAPICaller.GetStringResponseFrom(It.Is<System.Uri>(_uri => _uri == uri)))
-		//		.ReturnsAsync(replyMessage);
-
-		//	// Act & Assert
-		//	NullReferenceException exception = await Assert.ThrowsAsync<NullReferenceException>(async () => await bitfinexService.GetPriceAsync(dateAndHour));
-		//	Assert.Equal("source", exception.Message);
-		//}
 
 		// No test can run without this
 		private void SetupDefaultReturnStringForExternalApiCaller()

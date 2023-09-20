@@ -59,7 +59,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		}
 
 		[Fact]
-		public async Task GetJSONResponseFrom_Returns_JsonResponse()
+		public async Task GetJSONResponseFrom_Returns_JsonResponseAsync()
 		{
 			// Arrange
 			System.Uri uri = new("https://goosssgle.com/");

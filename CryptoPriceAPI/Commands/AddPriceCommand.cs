@@ -9,15 +9,15 @@ namespace CryptoPriceAPI.Commands
 
 		public CryptoPriceAPI.Data.Entities.DateAndHour DateAndHour { get; set; }
 
-		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrumentName { get; set; }
+		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrument { get; set; }
 
 		public System.Single ClosePrice { get; set; }
 
-		public AddPriceCommand(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName, System.Single closePrice)
+		public AddPriceCommand(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument, System.Single closePrice)
 		{
 			SourceId = sourceId;
 			DateAndHour = dateAndHour;
-			FinancialInstrumentName = financialInstrumentName;
+			FinancialInstrument = financialInstrument;
 			ClosePrice = closePrice;
 		}
 	}
@@ -37,7 +37,7 @@ namespace CryptoPriceAPI.Commands
 			{
 				SourceId = request.SourceId,
 				DateAndHour = request.DateAndHour,
-				FinancialInstrument = request.FinancialInstrumentName,
+				FinancialInstrument = request.FinancialInstrument,
 				ClosePrice = request.ClosePrice
 			};
 

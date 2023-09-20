@@ -8,13 +8,13 @@ namespace CryptoPriceAPI.Queries
 
 		public CryptoPriceAPI.Data.Entities.DateAndHour DateAndHour { get; set; }
 
-		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrumentName { get; set; }
+		public CryptoPriceAPI.Data.Entities.FinancialInstrument FinancialInstrument { get; set; }
 
-		public GetPriceQuery(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrumentName)
+		public GetPriceQuery(System.Guid sourceId, CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument)
 		{
 			SourceId = sourceId;
 			DateAndHour = dateAndHour;
-			FinancialInstrumentName = financialInstrumentName;
+			FinancialInstrument = financialInstrument;
 		}
 	}
 
@@ -32,7 +32,7 @@ namespace CryptoPriceAPI.Queries
 			return await _queryContext.Prices.FirstOrDefaultAsync(price =>
 					price.SourceId == request.SourceId &&
 					price.DateAndHourTicks == request.DateAndHour.DateTime.Ticks &&
-					price.FinancialInstrument == request.FinancialInstrumentName,
+					price.FinancialInstrument == request.FinancialInstrument,
 				cancellationToken: cancellationToken).ConfigureAwait(false);
 		}
 	}

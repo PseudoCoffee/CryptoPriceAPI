@@ -4,26 +4,26 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 {
 	public class OHLCPriceControllerTests
 	{
-		private readonly CryptoPriceAPI.Controller.OHLCPriceController ohlcPriceController;
+		private readonly CryptoPriceAPI.Controllers.OHLCPriceController ohlcPriceController;
 
-		private readonly Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Controller.OHLCPriceController>> mockLogger;
+		private readonly Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Controllers.OHLCPriceController>> mockLogger;
 		private readonly Mock<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>> mockAggregationService;
 		private readonly Mock<CryptoPriceAPI.Services.Interfaces.ICryptoService> mockCryptoService;
 
 		public OHLCPriceControllerTests()
 		{
-			mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<Controller.OHLCPriceController>>();
+			mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Controllers.OHLCPriceController>>();
 			mockAggregationService = new Mock<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
 			mockCryptoService = new Mock<CryptoPriceAPI.Services.Interfaces.ICryptoService>();
 
-			ohlcPriceController = new CryptoPriceAPI.Controller.OHLCPriceController(
+			ohlcPriceController = new CryptoPriceAPI.Controllers.OHLCPriceController(
 				mockLogger.Object,
 				mockAggregationService.Object,
 				new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService>() { mockCryptoService.Object });
 		}
 
 		[Fact]
-		public async Task GetCandleClosePrice_Returns_PriceDTO()
+		public async Task GetCandleClosePrice_Returns_PriceDTOAsync()
 		{
 			// Arrange
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
@@ -46,7 +46,7 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 		}
 
 		[Fact]
-		public async Task GetCandleClosePrice_Calls_CryptoService_Once()
+		public async Task GetCandleClosePrice_Calls_CryptoService_OnceAsync()
 		{
 			// Arrange
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
@@ -61,7 +61,7 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 		}
 
 		[Fact]
-		public async Task GetCandleClosePrice_Calls_MockAggregationService_Once()
+		public async Task GetCandleClosePrice_Calls_MockAggregationService_OnceAsync()
 		{
 			// Arrange
 			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
