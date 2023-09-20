@@ -2,11 +2,11 @@
 
 namespace CryptoPriceAPI.UnitTests.Services
 {
-	public class BitfinexServiceTests
+	public class BitstampServiceTests
 	{
-		private readonly CryptoPriceAPI.Services.BitfinexService bitfinexService;
+		private readonly CryptoPriceAPI.Services.BitstampService bitstampService;
 
-		private readonly Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Services.BitfinexService>> mockLogger;
+		private readonly Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Services.BitstampService>> mockLogger;
 		private readonly Mock<MediatR.IMediator> mockMediator;
 		private readonly Mock<CryptoPriceAPI.Services.Interfaces.IExternalAPICaller> mockExternalAPICaller;
 		private readonly Mock<Microsoft.Extensions.Options.IOptions<CryptoPriceAPI.Services.Configuration.PriceSources>> mockOptions;
@@ -19,9 +19,9 @@ namespace CryptoPriceAPI.UnitTests.Services
 		{
 			CryptoPriceAPI.Services.Helper.PriceSourceNameAttribute? priceSourceNameAttribute =
 				(CryptoPriceAPI.Services.Helper.PriceSourceNameAttribute?)Attribute.GetCustomAttribute(
-					typeof(CryptoPriceAPI.Services.BitfinexService), typeof(CryptoPriceAPI.Services.Helper.PriceSourceNameAttribute));
+					typeof(CryptoPriceAPI.Services.BitstampService), typeof(CryptoPriceAPI.Services.Helper.PriceSourceNameAttribute));
 
-			return priceSourceNameAttribute?.PriceSourceKey ?? throw new Exception($"Expected {nameof(CryptoPriceAPI.Services.Helper.PriceSourceNameAttribute)} not found or empty/null for {nameof(CryptoPriceAPI.Services.BitfinexService)}");
+			return priceSourceNameAttribute?.PriceSourceKey ?? throw new Exception($"Expected {nameof(CryptoPriceAPI.Services.Helper.PriceSourceNameAttribute)} not found or empty/null for {nameof(CryptoPriceAPI.Services.BitstampService)}");
 		}
 
 		private static CryptoPriceAPI.Services.Configuration.PriceSources GetPriceSources(System.String priceSource)
@@ -37,9 +37,9 @@ namespace CryptoPriceAPI.UnitTests.Services
 
 		#endregion
 
-		public BitfinexServiceTests()
+		public BitstampServiceTests()
 		{
-			mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Services.BitfinexService>>();
+			mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<CryptoPriceAPI.Services.BitstampService>>();
 			mockMediator = new Mock<MediatR.IMediator>();
 			mockExternalAPICaller = new Mock<CryptoPriceAPI.Services.Interfaces.IExternalAPICaller>();
 			mockOptions = new Mock<Microsoft.Extensions.Options.IOptions<CryptoPriceAPI.Services.Configuration.PriceSources>>();
@@ -54,7 +54,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.Setup(options => options.Value)
 				.Returns(priceSources);
 
-			bitfinexService = new CryptoPriceAPI.Services.BitfinexService(mockLogger.Object, mockMediator.Object, mockExternalAPICaller.Object, sourceName, mockOptions.Object);
+			bitstampService = new CryptoPriceAPI.Services.BitstampService(mockLogger.Object, mockMediator.Object, mockExternalAPICaller.Object, sourceName, mockOptions.Object);
 		}
 
 		[Fact]
@@ -72,7 +72,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(source);
 
 			// Act
-			await bitfinexService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetPriceAsync(dateAndHour);
 
 			// Assert
 			mockMediator.Verify(service => service.Send(It.IsAny<CryptoPriceAPI.Queries.GetSourceByNameQuery>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
@@ -91,7 +91,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync((CryptoPriceAPI.Data.Entities.Source?)null);
 
 			// Act & Assert
-			NullReferenceException exception = await Assert.ThrowsAsync<NullReferenceException>(async () => await bitfinexService.GetPriceAsync(dateAndHour));
+			NullReferenceException exception = await Assert.ThrowsAsync<NullReferenceException>(async () => await bitstampService.GetPriceAsync(dateAndHour));
 			Assert.Equal("source", exception.Message);
 		}
 
@@ -110,7 +110,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(source);
 
 			// Act
-			await bitfinexService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetPriceAsync(dateAndHour);
 
 			// Assert
 			mockMediator.Verify(service => service.Send(It.IsAny<CryptoPriceAPI.Queries.GetPriceQuery>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
@@ -144,7 +144,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.Returns(uri);
 
 			// Act
-			await bitfinexService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetPriceAsync(dateAndHour);
 
 			// Assert
 			mockExternalAPICaller.Verify(service => service.GenerateUri(
@@ -165,7 +165,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
 			System.Uri uri = new("https://www.test.com");
-			System.String replyMessage = $"[[ 1672534800000, 16557, 16571, 16571, 16556, 14.91083631 ]]";
+			System.String replyMessage = $"{{\"data\": {{\"ohlc\": [{{\"close\": \"16521\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}";
 
 			mockMediator
 				.Setup(mediator => mediator.Send(It.IsAny<CryptoPriceAPI.Queries.GetSourceByNameQuery>(), It.IsAny<System.Threading.CancellationToken>()))
@@ -188,7 +188,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			await bitfinexService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetPriceAsync(dateAndHour);
 
 			// Assert
 			mockExternalAPICaller.Verify(service => service.GetStringResponseFrom(It.Is<System.Uri>(_uri => _uri == uri)), Times.Once);
@@ -204,7 +204,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
 			System.Uri uri = new("https://www.test.com");
-			System.String replyMessage = $"[[ 1672534800000, 16557, 16571, 16571, 16556, 14.91083631 ]]";
+			System.String replyMessage = $"{{\"data\": {{\"ohlc\": [{{\"close\": \"16521\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}";
 
 			mockMediator
 				.Setup(mediator => mediator.Send(It.IsAny<CryptoPriceAPI.Queries.GetSourceByNameQuery>(), It.IsAny<System.Threading.CancellationToken>()))
@@ -227,7 +227,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			await bitfinexService.GetPriceAsync(dateAndHour);
+			await bitstampService.GetPriceAsync(dateAndHour);
 
 			// Assert
 			mockMediator.Verify(service => service.Send(It.IsAny<CryptoPriceAPI.Commands.AddPriceCommand>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
@@ -245,7 +245,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 			source.Name = sourceName;
 			System.Uri uri = new("https://www.test.com");
 			System.Single priceValue = 16571;
-			System.String replyMessage = $"[[ 1672534800000, 16557, {priceValue}, 16571, 16556, 14.91083631 ]]";
+			System.String replyMessage = $"{{\"data\": {{\"ohlc\": [{{\"close\": \"{priceValue}\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}";
 
 			mockMediator
 				.Setup(mediator => mediator.Send(It.IsAny<CryptoPriceAPI.Queries.GetSourceByNameQuery>(), It.IsAny<System.Threading.CancellationToken>()))
@@ -268,7 +268,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = await bitfinexService.GetPriceAsync(dateAndHour, financialInstrument);
+			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetPriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
 			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && priceValue == result.ClosePrice);
@@ -295,7 +295,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(price);
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = await bitfinexService.GetPriceAsync(dateAndHour, financialInstrument);
+			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetPriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
 			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && price.ClosePrice == result.ClosePrice);
@@ -306,7 +306,7 @@ namespace CryptoPriceAPI.UnitTests.Services
 		{
 			mockExternalAPICaller
 				.Setup(externalAPICaller => externalAPICaller.GetStringResponseFrom(It.IsAny<System.Uri>()))
-				.ReturnsAsync($"[[ 1672534800000, 16557, 16571, 16571, 16556, 14.91083631 ]]");
+				.ReturnsAsync($"{{\"data\": {{\"ohlc\": [{{\"close\": \"16521\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}");
 		}
 	}
 }
