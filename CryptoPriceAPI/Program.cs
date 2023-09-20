@@ -4,6 +4,8 @@ namespace CryptoPriceAPI
 {
 	public class Program
 	{
+
+
 		public static void Main(string[] args)
 		{
 			Microsoft.AspNetCore.Builder.WebApplicationBuilder builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
@@ -33,7 +35,7 @@ namespace CryptoPriceAPI
 				return ActivatorUtilities.CreateInstance<CryptoPriceAPI.Services.BitfinexService>(serviceProvider, "bitfinex");
 			});
 
-			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AggregationService>();
+			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AverageService>();
 
 			builder.Services.AddControllers().AddJsonOptions(config =>
 			{

@@ -10,7 +10,7 @@
 		[System.Diagnostics.CodeAnalysis.SetsRequiredMembers]
 		public DateAndHour(System.DateOnly dateOnly, System.Int32 hour)
 		{
-			if (hour < 0 || hour > 24)
+			if (hour < 0 || hour >= 24)
 			{
 				throw new ArgumentException($"{nameof(hour)} was outside of range [0, 23), value: {hour}", nameof(hour));
 			}

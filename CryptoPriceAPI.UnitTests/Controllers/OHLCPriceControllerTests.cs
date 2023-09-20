@@ -26,14 +26,14 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 		public async void GetCandleClosePrice_Returns_PriceDTO()
 		{
 			// Arrange
-			CryptoPriceAPI.DTOs.PriceDTO price = GetPriceDTOs(1).First();
+			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
 
 			mockCryptoService
 				.Setup(service => service.GetPriceAsync(
 					It.Is<CryptoPriceAPI.Data.Entities.DateAndHour>(dah => dah.DateTime == price.DateAndHour.DateTime),
 					It.Is<CryptoPriceAPI.Data.Entities.FinancialInstrument>(f => f == CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)))
 				.ReturnsAsync(price);
-			
+
 			mockAggregationService
 				.Setup(service => service.Aggregate(It.Is<System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO>>(p => p.Contains(price))))
 				.Returns(price);
@@ -46,27 +46,31 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 		}
 
 		[Fact]
-		public async void GetCandleClosePrice_FailsValidation()
+		public async void GetCandleClosePrice_Calls_CryptoService_Once()
 		{
 			// Arrange
-			System.DateOnly dateOnly = new(2022, 1, 1);
-			System.Int32 hour = 25;
+			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
 
-			// Act & Asser
-			await Assert.ThrowsAsync<ArgumentException>(async () => await ohlcPriceController.GetCandleClosePriceAsync(dateOnly, hour)).ConfigureAwait(false);
+			// Act
+			await ohlcPriceController.GetCandleClosePriceAsync(price.DateAndHour.DateOnly, price.DateAndHour.Hour);
+
+			// Assert
+			mockCryptoService.Verify(service => service.GetPriceAsync(
+				It.IsAny<CryptoPriceAPI.Data.Entities.DateAndHour>(),
+				It.IsAny<CryptoPriceAPI.Data.Entities.FinancialInstrument>()), Moq.Times.Once);
 		}
 
-		private static System.Collections.Generic.IEnumerable<CryptoPriceAPI.DTOs.PriceDTO> GetPriceDTOs(int number)
+		[Fact]
+		public async void GetCandleClosePrice_Calls_MockAggregationService_Once()
 		{
-			System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO> list = new()
-			{
-				new CryptoPriceAPI.DTOs.PriceDTO {  DateAndHour = new (new System.DateOnly(2022, 1, 1), 12), FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD, ClosePrice = 47039.03f },
-				new CryptoPriceAPI.DTOs.PriceDTO {  DateAndHour = new (new (2022, 3, 16), 12), FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD, ClosePrice = 40652.54f },
-				new CryptoPriceAPI.DTOs.PriceDTO {  DateAndHour = new (new (2022, 7, 1), 12), FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD, ClosePrice = 19460.875f },
-				new CryptoPriceAPI.DTOs.PriceDTO {  DateAndHour = new (new(2022, 11, 16), 12), FinancialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD, ClosePrice = 16484f },
-			};
+			// Arrange
+			CryptoPriceAPI.DTOs.PriceDTO price = CryptoPriceAPI.UnitTests.TestData.GetSameDateAndFinancialInstrumentPriceDTOs(1).First();
 
-			return list.Take(number);
+			// Act
+			await ohlcPriceController.GetCandleClosePriceAsync(price.DateAndHour.DateOnly, price.DateAndHour.Hour);
+
+			// Assert
+			mockAggregationService.Verify(service => service.Aggregate(It.IsAny<System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO>>()), Moq.Times.Once);
 		}
 	}
 }
