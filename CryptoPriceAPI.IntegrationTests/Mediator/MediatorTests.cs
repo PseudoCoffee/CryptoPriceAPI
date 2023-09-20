@@ -6,6 +6,7 @@ namespace CryptoPriceAPI.IntegrationTests.Mediator
 	public abstract class MediatorTests : Xunit.IClassFixture<CryptoPriceAPI.IntegrationTests.IntegrationTestWebAppFactory>
 	{
 		private readonly Microsoft.Extensions.DependencyInjection.IServiceScope scope;
+
 		protected readonly MediatR.IMediator _mediator;
 		protected readonly CryptoPriceAPI.Data.CryptoPriceAPIContext _cryptoPriceAPIContext;
 		protected readonly System.Collections.Generic.IReadOnlyList<CryptoPriceAPI.Data.Entities.Source> _sources;

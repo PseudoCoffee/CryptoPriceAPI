@@ -7,6 +7,6 @@
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour,
 			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD,
 			System.Int32 limit = 1);
-		public Task<System.String> GetStringResponseFrom(System.Uri url);
+		public Task<System.String> GetStringResponseFrom(System.Uri uri);
 	}
 }

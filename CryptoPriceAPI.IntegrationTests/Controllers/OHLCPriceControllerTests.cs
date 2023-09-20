@@ -110,7 +110,7 @@
 			System.Single price = GetPrice(PriceSet.Aggregated, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await this.aggregatedPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+			DTOs.PriceDTO response = await this._aggregatedPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
 			Assert.Equal(price, response.ClosePrice);
@@ -129,7 +129,7 @@
 			System.Single price = GetPrice(PriceSet.Bitfinex, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await bitfinexPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+			DTOs.PriceDTO response = await _bitfinexPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
 			Assert.Equal(price, response.ClosePrice);
@@ -148,7 +148,7 @@
 			System.Single price = GetPrice(PriceSet.Bitstamp, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await bitstampPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+			DTOs.PriceDTO response = await _bitstampPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
 			Assert.Equal(price, response.ClosePrice);
