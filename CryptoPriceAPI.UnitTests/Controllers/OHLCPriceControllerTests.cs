@@ -17,8 +17,8 @@ namespace CryptoPriceAPI.UnitTests.Controllers
 			mockCryptoService = new Mock<CryptoPriceAPI.Services.Interfaces.ICryptoService>();
 
 			ohlcPriceController = new CryptoPriceAPI.Controller.OHLCPriceController(
-				mockAggregationService.Object,
 				mockLogger.Object,
+				mockAggregationService.Object,
 				new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService>() { mockCryptoService.Object });
 		}
 

@@ -3,14 +3,14 @@
 	[Microsoft.AspNetCore.Mvc.ApiController]
 	public class OHLCPriceController : Microsoft.AspNetCore.Mvc.ControllerBase
 	{
-		private readonly CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> _aggregationService;
 		private readonly Microsoft.Extensions.Logging.ILogger<OHLCPriceController> _logger;
+		private readonly CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> _aggregationService;
 
 		private readonly System.Collections.Generic.IEnumerable<CryptoPriceAPI.Services.Interfaces.ICryptoService> _externalServices;
 
 		public OHLCPriceController(
-			CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> aggregationService,
 			Microsoft.Extensions.Logging.ILogger<OHLCPriceController> logger,
+			CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO> aggregationService,
 			System.Collections.Generic.IEnumerable<CryptoPriceAPI.Services.Interfaces.ICryptoService> externalServices
 			)
 		{

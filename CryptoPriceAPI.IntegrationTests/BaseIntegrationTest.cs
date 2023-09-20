@@ -14,20 +14,20 @@ namespace CryptoPriceAPI.IntegrationTests
 		{
 			scope = factory.Services.CreateAsyncScope();
 
-			var aggregationService = scope.ServiceProvider.GetRequiredService<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
 			var logger = scope.ServiceProvider.GetRequiredService<ILogger<CryptoPriceAPI.Controller.OHLCPriceController>>();
+			var aggregationService = scope.ServiceProvider.GetRequiredService<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
 			var externalServices = scope.ServiceProvider.GetRequiredService<System.Collections.Generic.IEnumerable<CryptoPriceAPI.Services.Interfaces.ICryptoService>>();
-			aggregatedPriceController = new Controller.OHLCPriceController(aggregationService, logger, externalServices);
+			aggregatedPriceController = new Controller.OHLCPriceController(logger, aggregationService, externalServices);
 
-			var bfService = externalServices.First(service => service is CryptoPriceAPI.Services.BitfinexService);
-			var bfAggregationService = scope.ServiceProvider.GetRequiredService<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
 			var bfLogger = scope.ServiceProvider.GetRequiredService<ILogger<CryptoPriceAPI.Controller.OHLCPriceController>>();
-			bitfinexPriceController = new CryptoPriceAPI.Controller.OHLCPriceController(bfAggregationService, bfLogger, new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService> { bfService });
+			var bfAggregationService = scope.ServiceProvider.GetRequiredService<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
+			var bfService = externalServices.First(service => service is CryptoPriceAPI.Services.BitfinexService);
+			bitfinexPriceController = new CryptoPriceAPI.Controller.OHLCPriceController(bfLogger, bfAggregationService, new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService> { bfService });
 
-			var bsService = externalServices.First(service => service is CryptoPriceAPI.Services.BitstampService);
-			var bsAggregationService = scope.ServiceProvider.GetRequiredService<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
 			var bsLogger = scope.ServiceProvider.GetRequiredService<ILogger<CryptoPriceAPI.Controller.OHLCPriceController>>();
-			bitstampPriceController = new CryptoPriceAPI.Controller.OHLCPriceController(bsAggregationService, bsLogger, new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService> { bsService });
+			var bsAggregationService = scope.ServiceProvider.GetRequiredService<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>>();
+			var bsService = externalServices.First(service => service is CryptoPriceAPI.Services.BitstampService);
+			bitstampPriceController = new CryptoPriceAPI.Controller.OHLCPriceController(bsLogger, bsAggregationService, new System.Collections.Generic.List<CryptoPriceAPI.Services.Interfaces.ICryptoService> { bsService });
 		}
 	}
 }

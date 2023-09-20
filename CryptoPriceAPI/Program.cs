@@ -40,6 +40,7 @@ namespace CryptoPriceAPI
 			}
 
 			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IAggregationService<CryptoPriceAPI.DTOs.PriceDTO>, CryptoPriceAPI.Services.AverageService>();
+			builder.Services.AddScoped<CryptoPriceAPI.Services.Interfaces.IExternalAPICaller, CryptoPriceAPI.Services.ExternalAPICaller>();
 
 			builder.Services.AddControllers().AddJsonOptions(config =>
 			{
