@@ -1,7 +1,9 @@
 # CryptoPriceAPI
 A small API to fetch and cache prices of cryptocurrency.
 
-API checks first checks if the price is not already cached into a PostgreSQL database hosted in a different container.
+API checks first checks if the price is not already cached into a PostgreSQL database hosted in a container.
+
+Doccumentation availabe with Swagger at <span>http</span>://localhost:`port`/swagger/index.html
 
 Websites currently used to fetch prices
 - Bitfinex (example: https://api-pub.bitfinex.com/v2/candles/trade:1h:tBTCUSD/hist?start=1672531200000&end=1672534800000&limit=1)
@@ -19,3 +21,7 @@ Websites currently used to fetch prices
 4. Else send request to external API to fetch price.
 5. Take the reply and obtain a price.
 6. Return the price.
+
+## How to use it
+1. run `docker-compose up`.
+2. Either use <span>http</span>://localhost:`port`/swagger/index.html in any web browser for a visual interface or call the api directly with <span>http</span>://localhost:`port`/GetCandleClosePrice?dateOnly=2023.1.1&hour=1
