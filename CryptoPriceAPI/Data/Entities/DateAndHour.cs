@@ -24,6 +24,7 @@
 		{
 		}
 
+		[Newtonsoft.Json.JsonIgnore]
 		public System.DateTime DateTime => DateOnly.ToDateTime(new TimeOnly(Hour, 0));
 	}
 }

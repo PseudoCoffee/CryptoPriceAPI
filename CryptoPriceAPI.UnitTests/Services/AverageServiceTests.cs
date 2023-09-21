@@ -27,9 +27,10 @@ namespace CryptoPriceAPI.UnitTests.Services
 			System.Single averagePrice = prices.Select(price => price.ClosePrice).Average();
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = averageService.Aggregate(prices);
+			CryptoPriceAPI.DTOs.PriceDTO? result = averageService.Aggregate(prices);
 
 			// Assert
+			Assert.NotNull(result);
 			Assert.Equal(result.ClosePrice, averagePrice);
 		}
 
@@ -47,9 +48,11 @@ namespace CryptoPriceAPI.UnitTests.Services
 		{
 			// Arrange
 
-			// Act & Assert
-			ArgumentException exception = Assert.Throws<ArgumentException>(() => averageService.Aggregate(new System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO>()));
-			Assert.Equal($"prices contains no elements.", exception.Message);
+			// Act 
+			CryptoPriceAPI.DTOs.PriceDTO? result = averageService.Aggregate(new System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO>());
+			
+			// Assert
+			Assert.Null(result);
 		}
 
 		[Theory]

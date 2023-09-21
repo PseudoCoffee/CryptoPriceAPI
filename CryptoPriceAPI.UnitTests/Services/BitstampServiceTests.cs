@@ -61,8 +61,6 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async void GetPriceAsync_CallsMediator_GetSourceByNameQuery_OnceAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
@@ -82,8 +80,6 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async Task GetPriceAsync_Throws_NullReferenceException_SourceAsyncAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 
 			mockMediator
@@ -99,8 +95,6 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async void GetPriceAsync_CallsMediator_GetPriceQuery_OnceAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
@@ -120,11 +114,10 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async void GetPriceAsync_PriceNotInDB_CallsExternalAPI_GenerateUri_OnceAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
+
 			System.Uri uri = new("https://www.test.com");
 
 			mockMediator
@@ -159,11 +152,10 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async void GetPriceAsync_PriceNotInDB_CallsExternalAPI_GetStringResponseFrom_OnceAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
+
 			System.Uri uri = new("https://www.test.com");
 			System.String replyMessage = $"{{\"data\": {{\"ohlc\": [{{\"close\": \"16521\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}";
 
@@ -198,11 +190,10 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async void GetPriceAsync_PriceNotInDB_CallsMediator_AddPriceCommandAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
+
 			System.Uri uri = new("https://www.test.com");
 			System.String replyMessage = $"{{\"data\": {{\"ohlc\": [{{\"close\": \"16521\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}";
 
@@ -237,12 +228,11 @@ namespace CryptoPriceAPI.UnitTests.Services
 		public async void GetPriceAsync_PriceNotInDB_ReturnsCorrectPriceDTOAsync()
 		{
 			// Arrange
-			SetupDefaultReturnStringForExternalApiCaller();
-
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
+
 			System.Uri uri = new("https://www.test.com");
 			System.Single priceValue = 16571;
 			System.String replyMessage = $"{{\"data\": {{\"ohlc\": [{{\"close\": \"{priceValue}\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}";
@@ -268,9 +258,10 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(replyMessage);
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetCandleClosePriceAsync(dateAndHour, financialInstrument);
+			CryptoPriceAPI.DTOs.PriceDTO? result = await bitstampService.GetCandleClosePriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
+			Assert.NotNull(result);
 			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && priceValue == result.ClosePrice);
 		}
 
@@ -280,9 +271,9 @@ namespace CryptoPriceAPI.UnitTests.Services
 			// Arrange
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(new DateOnly(2023, 1, 1), 0);
 			CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD;
-
 			CryptoPriceAPI.Data.Entities.Source source = CryptoPriceAPI.UnitTests.TestData.GetSources(1).First();
 			source.Name = sourceName;
+
 			CryptoPriceAPI.Data.Entities.Price price = CryptoPriceAPI.UnitTests.TestData.GetRandomPrices(1).First();
 			price.DateAndHour = dateAndHour;
 
@@ -295,18 +286,11 @@ namespace CryptoPriceAPI.UnitTests.Services
 				.ReturnsAsync(price);
 
 			// Act
-			CryptoPriceAPI.DTOs.PriceDTO result = await bitstampService.GetCandleClosePriceAsync(dateAndHour, financialInstrument);
+			CryptoPriceAPI.DTOs.PriceDTO? result = await bitstampService.GetCandleClosePriceAsync(dateAndHour, financialInstrument);
 
 			// Assert
+			Assert.NotNull(result);
 			Assert.True(dateAndHour.DateTime == result.DateAndHour.DateTime && financialInstrument == result.FinancialInstrument && price.ClosePrice == result.ClosePrice);
-		}
-
-		// No test can run without this
-		private void SetupDefaultReturnStringForExternalApiCaller()
-		{
-			mockExternalAPICaller
-				.Setup(externalAPICaller => externalAPICaller.GetStringResponseFrom(It.IsAny<System.Uri>()))
-				.ReturnsAsync($"{{\"data\": {{\"ohlc\": [{{\"close\": \"16521\", \"high\": \"16532\", \"low\": \"16507\", \"open\": \"16530\", \"timestamp\": \"1672531200\", \"volume\": \"17.05204457\"}}], \"pair\": \"BTC/USD\"}}}}");
 		}
 	}
 }

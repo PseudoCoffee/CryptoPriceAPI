@@ -98,6 +98,21 @@
 		}
 
 		[Theory]
+		[InlineData(1970, 7, 11, 12)]
+		[InlineData(1999, 2, 21, 12)]
+		public async Task GetCandleClosePrice_ReturnsNull(System.Int32 year, System.Int32 month, System.Int32 day, System.Int32 hour)
+		{
+			// Arrange
+			System.DateOnly dateOnly = new(year, month, day);
+
+			// Act
+			DTOs.PriceDTO? response = await _aggregatedPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+
+			// Assert
+			Assert.Null(response);
+		}
+
+		[Theory]
 		[InlineData(2022, 1, 1, 12)]
 		[InlineData(2022, 4, 16, 12)]
 		[InlineData(2022, 6, 16, 12)]
@@ -110,9 +125,10 @@
 			System.Single price = GetPrice(PriceSet.Aggregated, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await this._aggregatedPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+			DTOs.PriceDTO? response = await this._aggregatedPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
+			Assert.NotNull(response);
 			Assert.Equal(price, response.ClosePrice);
 		}
 
@@ -129,9 +145,10 @@
 			System.Single price = GetPrice(PriceSet.Bitfinex, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await _bitfinexPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+			DTOs.PriceDTO? response = await this._bitfinexPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
+			Assert.NotNull(response);
 			Assert.Equal(price, response.ClosePrice);
 		}
 
@@ -148,9 +165,10 @@
 			System.Single price = GetPrice(PriceSet.Bitstamp, dateOnly, hour);
 
 			// Act
-			DTOs.PriceDTO response = await _bitstampPriceController.GetCandleClosePriceAsync(dateOnly, hour);
+			DTOs.PriceDTO? response = await _bitstampPriceController.GetCandleClosePriceAsync(dateOnly, hour);
 
 			// Assert
+			Assert.NotNull(response);
 			Assert.Equal(price, response.ClosePrice);
 		}
 

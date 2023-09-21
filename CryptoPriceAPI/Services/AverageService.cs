@@ -12,7 +12,7 @@ namespace CryptoPriceAPI.Services
 			_logger = logger;
 		}
 
-		public CryptoPriceAPI.DTOs.PriceDTO Aggregate(System.Collections.Generic.IEnumerable<CryptoPriceAPI.DTOs.PriceDTO> prices)
+		public CryptoPriceAPI.DTOs.PriceDTO? Aggregate(System.Collections.Generic.IEnumerable<CryptoPriceAPI.DTOs.PriceDTO?> prices)
 		{
 			_logger.LogInformation("Aggregate({@0})", prices);
 
@@ -24,40 +24,39 @@ namespace CryptoPriceAPI.Services
 				throw exception;
 			}
 
-			if (!prices.Any())
-			{
-				ArgumentException exception = new($"{nameof(prices)} contains no elements.");
-				_logger.LogError(exception, "{@0}", exception.Message);
+			System.Collections.Generic.IEnumerable<CryptoPriceAPI.DTOs.PriceDTO> notNullPrices = prices.Where(price => null != price).Select(price => price!);
 
-				throw exception;
+			CryptoPriceAPI.DTOs.PriceDTO? aggregatedPriceDTO = null;
+
+			if (notNullPrices.Any())
+			{
+				if (notNullPrices.Select(price => price.DateAndHour.DateTime).Distinct().Count() > 1)
+				{
+					ArgumentException exception = new("Cannot aggregate prices with different timestamps.");
+					_logger.LogError(exception, "{@0}", exception.Message);
+
+					throw exception;
+				}
+
+				if (notNullPrices.Select(price => price.FinancialInstrument).Distinct().Count() > 1)
+				{
+					ArgumentException exception = new("Cannot aggregate prices with different financial instrument name.");
+					_logger.LogError(exception, "{@0}", exception.Message);
+
+					throw exception;
+				}
+
+				_logger.LogInformation("Aggregating {@0} prices", notNullPrices.Count());
+
+				aggregatedPriceDTO = new()
+				{
+					DateAndHour = notNullPrices.First().DateAndHour,
+					FinancialInstrument = notNullPrices.First().FinancialInstrument,
+					ClosePrice = notNullPrices.Average(price => price.ClosePrice)
+				};
 			}
 
-			if (prices.Select(price => price.DateAndHour.DateTime).Distinct().Count() != 1)
-			{
-				ArgumentException exception = new("Cannot aggregate prices with different timestamps.");
-				_logger.LogError(exception, "{@0}", exception.Message);
-
-				throw exception;
-			}
-
-			if (prices.Select(price => price.FinancialInstrument).Distinct().Count() != 1)
-			{
-				ArgumentException exception = new("Cannot aggregate prices with different financial instrument name.");
-				_logger.LogError(exception, "{@0}", exception.Message);
-
-				throw exception;
-			}
-
-			_logger.LogInformation("Aggregating {@0} prices", prices.Count());
-
-			CryptoPriceAPI.DTOs.PriceDTO priceDTO = new()
-			{
-				DateAndHour = prices.First().DateAndHour,
-				FinancialInstrument = prices.First().FinancialInstrument,
-				ClosePrice = prices.Average(price => price.ClosePrice)
-			};
-
-			return priceDTO;
+			return aggregatedPriceDTO;
 		}
 	}
 }

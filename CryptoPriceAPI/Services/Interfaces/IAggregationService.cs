@@ -7,6 +7,6 @@
 		/// </summary>
 		/// <param name="data"> Data to be aggregated. </param>
 		/// <returns> An aggregated result of all <paramref name="data"/>. </returns>
-		public DTO Aggregate(System.Collections.Generic.IEnumerable<DTO> data);
+		public DTO? Aggregate(System.Collections.Generic.IEnumerable<DTO?> data);
 	}
 }

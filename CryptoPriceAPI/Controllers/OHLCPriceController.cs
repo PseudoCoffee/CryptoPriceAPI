@@ -30,16 +30,25 @@
 		/// </summary>
 		/// <param name="dateOnly">Date of the candle price</param>
 		/// <param name="hour">Starting hour of the candle price</param>
-		/// <returns> An aggregated price of multiple sources from same date and hour. </returns>
+		/// <returns> An aggregated price of multiple sources from same date and hour or null if no prices found on any external source. </returns>
+		/// <remarks>
+		/// Sample request:
+		/// GET /GetCandleClosePrice
+		/// {
+		///		"dateOnly": "2023.01.01"
+		///		"hour": 0
+		/// }		/// 
+		/// </remarks>
 		[Microsoft.AspNetCore.Mvc.HttpGet]
 		[Microsoft.AspNetCore.Mvc.Route("GetCandleClosePrice")]
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetCandleClosePriceAsync(System.DateOnly dateOnly, [System.ComponentModel.DataAnnotations.Range(0, 23)] System.Int32 hour)
+		[Microsoft.AspNetCore.Mvc.Produces("application/json")]
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO?> GetCandleClosePriceAsync(System.DateOnly dateOnly, [System.ComponentModel.DataAnnotations.Range(0, 23)] System.Int32 hour)
 		{
 			_logger.LogInformation("GetCandleClosePrice({@0}, {@1})", dateOnly, hour);
 
 			CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour = new(dateOnly, hour);
 
-			System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO> prices = new();
+			System.Collections.Generic.List<CryptoPriceAPI.DTOs.PriceDTO?> prices = new();
 
 			foreach (CryptoPriceAPI.Services.Interfaces.ICryptoService externalService in _externalServices)
 			{

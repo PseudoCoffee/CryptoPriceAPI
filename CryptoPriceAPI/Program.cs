@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using CryptoPriceAPI.Services.Helper;
-using Microsoft.Extensions.Http;
 
 namespace CryptoPriceAPI
 {
@@ -51,7 +50,11 @@ namespace CryptoPriceAPI
 
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+			builder.Services.AddSwaggerGen(options => {
+				var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+			});
+
 
 			Microsoft.AspNetCore.Builder.WebApplication app = builder.Build();
 
@@ -75,8 +78,14 @@ namespace CryptoPriceAPI
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
 			{
-				app.UseSwagger();
-				app.UseSwaggerUI();
+				app.UseSwagger(options =>
+				{
+					options.SerializeAsV2 = true;
+				});
+				app.UseSwaggerUI(options =>
+				{
+					options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+				});
 			}
 
 			app.UseAuthorization();

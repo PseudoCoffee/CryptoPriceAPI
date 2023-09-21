@@ -1,8 +1,6 @@
-﻿using CryptoPriceAPI.Data.Entities;
-
-namespace CryptoPriceAPI.Services.Interfaces
+﻿namespace CryptoPriceAPI.Services.Interfaces
 {
-	public abstract class ACryptoService<ExternalDTO> : ICryptoService where ExternalDTO : CryptoPriceAPI.DTOs.Interfaces.IExternalDTO
+	public abstract class ACryptoService<ExternalDTO> : ICryptoService where ExternalDTO : class, CryptoPriceAPI.DTOs.Interfaces.IExternalDTO
 	{
 		protected readonly Microsoft.Extensions.Logging.ILogger<ACryptoService<ExternalDTO>> _logger;
 		protected readonly MediatR.IMediator _mediator;
@@ -41,7 +39,7 @@ namespace CryptoPriceAPI.Services.Interfaces
 			_cryptoConfiguration = options.Value[sourceName];
 		}
 
-		public async Task<CryptoPriceAPI.DTOs.PriceDTO> GetCandleClosePriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
+		public async Task<CryptoPriceAPI.DTOs.PriceDTO?> GetCandleClosePriceAsync(CryptoPriceAPI.Data.Entities.DateAndHour dateAndHour, CryptoPriceAPI.Data.Entities.FinancialInstrument financialInstrument = CryptoPriceAPI.Data.Entities.FinancialInstrument.BTCUSD)
 		{
 			_logger.LogInformation("GetPriceAsync({@0})", dateAndHour);
 
@@ -56,24 +54,27 @@ namespace CryptoPriceAPI.Services.Interfaces
 			}
 
 			CryptoPriceAPI.Data.Entities.Price? price = await _mediator.Send(new CryptoPriceAPI.Queries.GetPriceQuery(source.Id, dateAndHour, financialInstrument));
-			CryptoPriceAPI.DTOs.PriceDTO priceDTO;
+			CryptoPriceAPI.DTOs.PriceDTO? priceDTO = null;
 
 			if (null == price)
 			{
 				_logger.LogInformation("No price found in database.{@0}Build url for external api.", System.Environment.NewLine);
 				System.Uri uri = _externalAPICaller.GenerateUri(_cryptoConfiguration, dateAndHour, financialInstrument);
 
-				_logger.LogInformation("Call external API for price.");
+				_logger.LogInformation("Call external API for price");
 				System.String jsonResponse = await _externalAPICaller.GetStringResponseFrom(uri);
 
 				_logger.LogInformation("Convert json to externalDTO.");
-				ExternalDTO externalDTO = ConvertJsonToExternalDTO(jsonResponse);
+				ExternalDTO? externalDTO = ConvertJsonToExternalDTO(jsonResponse);
 
-				_logger.LogInformation("Convert externalDTO to priceDTO.");
-				priceDTO = ConvertExternalDTOToPriceDTO(externalDTO, dateAndHour, financialInstrument);
+				if (null != externalDTO)
+				{
+					_logger.LogInformation("Convert externalDTO to priceDTO.");
+					priceDTO = ConvertExternalDTOToPriceDTO(externalDTO, dateAndHour, financialInstrument);
 
-				_logger.LogInformation("Cache the price in the DB.");
-				await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(source.Id, priceDTO.DateAndHour, priceDTO.FinancialInstrument, priceDTO.ClosePrice));
+					_logger.LogInformation("Cache the price in the DB.");
+					await _mediator.Send(new CryptoPriceAPI.Commands.AddPriceCommand(source.Id, priceDTO.DateAndHour, priceDTO.FinancialInstrument, priceDTO.ClosePrice));
+				}
 			}
 			else
 			{
@@ -90,11 +91,11 @@ namespace CryptoPriceAPI.Services.Interfaces
 		}
 
 		/// <summary>
-		/// Format given <paramref name="jsonDTO"/> to <typeparamref name="ExternalDTO"/>. 
+		/// Format given <paramref name="jsonDTO"/> to <typeparamref name="ExternalDTO"/>.
 		/// </summary>
 		/// <param name="jsonDTO"> String in json format to be deserialized. </param>
-		/// <returns> <typeparamref name="ExternalDTO"/> containing the information of <paramref name="jsonDTO"/>. </returns>
-		private ExternalDTO ConvertJsonToExternalDTO(System.String jsonDTO)
+		/// <returns> <typeparamref name="ExternalDTO"/> containing the information of <paramref name="jsonDTO"/> or null if it cannot be parsed. </returns>
+		private ExternalDTO? ConvertJsonToExternalDTO(System.String jsonDTO)
 		{
 			_logger.LogInformation("ConvertJsonToDTO({@0})", jsonDTO);
 
@@ -104,15 +105,23 @@ namespace CryptoPriceAPI.Services.Interfaces
 				PropertyNameCaseInsensitive = true
 			};
 
-			ExternalDTO externalDTO;
+			ExternalDTO? externalDTO;
 			try
 			{
 				externalDTO = System.Text.Json.JsonSerializer.Deserialize<ExternalDTO>(jsonDTO, options)!;
+				if (null == externalDTO?.GetCloseOHCL())
+				{
+					Exception exception = new("Failed to deserialize");
+					_logger.LogError(exception, "{@0}", exception.Message);
+
+					throw exception;
+				}
 			}
-			catch (Exception ex)
+			catch (Exception exception)
 			{
-				_logger.LogError("{@0}", ex.Message);
-				throw;
+				externalDTO = null;
+
+				_logger.LogError(exception, "{@0}", exception.Message);
 			}
 
 			return externalDTO;
