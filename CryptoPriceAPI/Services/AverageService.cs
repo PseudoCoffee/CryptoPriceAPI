@@ -24,12 +24,14 @@ namespace CryptoPriceAPI.Services
 				throw exception;
 			}
 
+			// filter out any null prices
 			System.Collections.Generic.IEnumerable<CryptoPriceAPI.DTOs.PriceDTO> notNullPrices = prices.Where(price => null != price).Select(price => price!);
 
 			CryptoPriceAPI.DTOs.PriceDTO? aggregatedPriceDTO = null;
 
 			if (notNullPrices.Any())
 			{
+				// cannot average prices with different timestamps
 				if (notNullPrices.Select(price => price.DateAndHour.DateTime).Distinct().Count() > 1)
 				{
 					ArgumentException exception = new("Cannot aggregate prices with different timestamps.");
@@ -38,9 +40,10 @@ namespace CryptoPriceAPI.Services
 					throw exception;
 				}
 
+				// cannot average prices with different financial instrument names
 				if (notNullPrices.Select(price => price.FinancialInstrument).Distinct().Count() > 1)
 				{
-					ArgumentException exception = new("Cannot aggregate prices with different financial instrument name.");
+					ArgumentException exception = new("Cannot aggregate prices with different financial instrument names.");
 					_logger.LogError(exception, "{@0}", exception.Message);
 
 					throw exception;

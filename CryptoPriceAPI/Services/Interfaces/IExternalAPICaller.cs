@@ -17,7 +17,7 @@
 			System.Int32 limit = 1);
 
 		/// <summary>
-		/// Call the given <paramref name="uri"/> and return the result.
+		/// Call the given <paramref name="uri"/> and return the resulting string.
 		/// </summary>
 		/// <param name="uri"> URI to be called. </param>
 		/// <returns> A string with the body response of the <paramref name="uri"/>. </returns>

@@ -53,10 +53,10 @@
 				throw exception;
 			}
 
-			CryptoPriceAPI.Data.Entities.Price? price = await _mediator.Send(new CryptoPriceAPI.Queries.GetPriceQuery(source.Id, dateAndHour, financialInstrument));
+			CryptoPriceAPI.Data.Entities.Price? priceDB = await _mediator.Send(new CryptoPriceAPI.Queries.GetPriceQuery(source.Id, dateAndHour, financialInstrument));
 			CryptoPriceAPI.DTOs.PriceDTO? priceDTO = null;
 
-			if (null == price)
+			if (null == priceDB)
 			{
 				_logger.LogInformation("No price found in database.{@0}Build url for external api.", System.Environment.NewLine);
 				System.Uri uri = _externalAPICaller.GenerateUri(_cryptoConfiguration, dateAndHour, financialInstrument);
@@ -81,9 +81,9 @@
 				_logger.LogInformation("Price found in database.");
 				priceDTO = new CryptoPriceAPI.DTOs.PriceDTO
 				{
-					DateAndHour = price.DateAndHour,
+					DateAndHour = priceDB.DateAndHour,
 					FinancialInstrument = financialInstrument,
-					ClosePrice = price.ClosePrice,
+					ClosePrice = priceDB.ClosePrice,
 				};
 			}
 
@@ -99,6 +99,7 @@
 		{
 			_logger.LogInformation("ConvertJsonToDTO({@0})", jsonDTO);
 
+			// allow parsing of floating point numbers and do not be case sensitive
 			System.Text.Json.JsonSerializerOptions options = new()
 			{
 				NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString | System.Text.Json.Serialization.JsonNumberHandling.WriteAsString,
@@ -109,6 +110,8 @@
 			try
 			{
 				externalDTO = System.Text.Json.JsonSerializer.Deserialize<ExternalDTO>(jsonDTO, options)!;
+
+				// verify if the resulting DTO is valid
 				if (null == externalDTO?.GetCloseOHCL())
 				{
 					Exception exception = new("Failed to deserialize");
@@ -119,6 +122,7 @@
 			}
 			catch (Exception exception)
 			{
+				// invalidate the DTO
 				externalDTO = null;
 
 				_logger.LogError(exception, "{@0}", exception.Message);
@@ -139,7 +143,7 @@
 			_logger.LogInformation("ConvertExternalDTOToPriceDTO({@0}, {@1})", dateAndHour, financialInstrument);
 			return new CryptoPriceAPI.DTOs.PriceDTO
 			{
-				DateAndHour = dateAndHour,
+				DateAndHour = dateAndHour, // externalDTO timestamp shows timestamp adjusted for system timezone regardless of request hour therefore we use dateAndHour of request
 				FinancialInstrument = financialInstrument,
 				ClosePrice = externalDTO.GetCloseOHCL()
 			};

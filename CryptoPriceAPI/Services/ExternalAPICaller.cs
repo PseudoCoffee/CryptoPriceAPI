@@ -21,17 +21,20 @@
 
 			System.DateTime dateHour = dateAndHour.DateTime;
 
+			// request replies will vary by timezone we offset this by always using UTC+0
 			System.TimeSpan differenceToUTC = dateHour - dateHour.ToUniversalTime();
 
 			System.Int64 startTime = ((DateTimeOffset)dateHour.Add(differenceToUTC)).ToUnixTimeSeconds();
 			System.Int64? endTime = null == cryptoConfiguration.EndFormat ? null : startTime + 3600;
 
+			// if the api requires ticks to be in milliseconds, we need to convert from seconds to milliseconds by multiplying by 1000
 			if (cryptoConfiguration.TimeFormat == CryptoPriceAPI.Services.Configuration.TimeFormat.Milliseconds)
 			{
 				startTime *= 1000;
 				endTime *= 1000;
 			}
 
+			// some apis require the financialInstrumentNameString to be lowercase (btcusd) while some require uppercase (BTCUSD)
 			System.String financialInstrumentNameString = financialInstrument.ToString();
 			financialInstrumentNameString =
 				cryptoConfiguration.UppercaseFinancialInstrument ?
